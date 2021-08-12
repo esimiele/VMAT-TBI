@@ -1,5 +1,16 @@
-Hi
-8-12-2021
+updated on 8-12-2021
+
+Latest code versions:
+Plug-in --> v1.5
+Executable --> v1.0
+
+Updates to both scripts from v1.4/v0.9 (i.e., pre- 8/12/2021):
+-Fixed minor bugs and GUI formatting issues in both codes
+-Added code to allow the user to specify default settings in both scripts in a .ini configuration file (see the VMAT_TBI_config.ini example provided with the code)
+-Both scripts will look for this file (in the directory that the script was called from) upon execution
+-The default options for both scripts can be set in this .ini file to reduce the number of times an end-user needs to make changes to the underlying code and recompile
+-Both GUI's have been updated to include a new tab to show the current configuration settings
+-Please see Section 7 of the 'VMAT_TBI_guide.pdf' file for more details on how to setup and use the configuration file
 
 ESAPI/Projects/VMATTBIautoPlan --> binary plug in
 ESAPI_MT/VMATTBI_optLoopMT --> stand-alone executable
@@ -8,29 +19,15 @@ Some important notes to make the scripts run:
 binary plug-in:
 -for the most part, this script is pretty self-contained
 -the main parameters that can be adjusted are the global variables noted at the beginning of the UI class (UI.xaml.cs file)
--if you want to adjust the default superior-inferior margin applied to contouring the overlap between VMAT fields in adjacent isocenters, adjust the initial assignment of
-contourOverlapTB.Text near the top of the populateBeamsTab method (line 600)
 -if you want to adjust the default energy for the static AP/PA beams, you need to adjust the beam energy specifier used in assigning ebmpStatic 
 (two total instances of "6X" in the constructors for the class)
 
 stand-alone executable:
 -most of the global variables are listed in the header for the MainWindow class (indicated near the top)
--plan quality objectives used in the code can be adjusted by modifying the objectives listed in the dataContainer struct in the optimizationLoop class
- *in particular, the 'threhold' and 'lowDoseLimit' variables will impact the decisions the algorithm makes when deciding how to modify the current optimization constraints
- currently, they are set to 15% and 10%, respectively.
 -If you want to use/not use jaw tracking or the normal tissue objective (NTO) in the optimization, modify the values for the plan.OptimizationSetup.UseJawTracking and 
 plan.OptimizationSetup.AddAutomaticNormalTissueObjective variables near the bottom of the preliminaryChecks method in the optimizationLoop class
--if you want to use different dose levels/ranges or priorities to generate the heater and cooler optimization structures, adjust the values near the bottom of the 
-evaluateAndUpdatePlan method of the optimizationLoop class (lines 659 - 690 of the initial upload code)
--if you want a demo of how the code runs, you can change the 'demo' global variable in the progressWindow class to true. Instead of running actual optimizations and dose calculations
-the code will instead sleep for three seconds. This gives you a chance to see what information is reported as the code runs
--IMPORTANT!
-  ** You will need to change the default paths in the updateLogFile and WriteResults_Click methods of the progressWindow class! If you don't do this, the code will likely crash!
-  The paths in the updateLogFile method are used to write a text log file as the code runs (useful if the code crashes). Set these paths to a location that has a low risk of
-  being deleted. The path in the WriteResults_Click method is used when the user hits the 'write results to file' button. Set this path to a default directory where the 
-  filebrowserdialog window should open.
 
-Currently working on updating the install and run instructions.
+Currently working on updating the install instructions.
 Stay tuned.
 
 If you have questions, leave a comment and i'll try and respond as quickly as I can.
