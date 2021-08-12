@@ -25,46 +25,13 @@ namespace VMATTBI_optLoop
 {
     public partial class progressWindow : Window
     {
-        //[DllImport("user32.dll")]
-        //static extern int FindWindow(string lpClassName, string lpWindowName);
-        //[DllImport("user32.dll")]
-        //public static extern int SendMessage(int hWnd, uint Msg, int wParam, int lParam);
-        //public const int WM_SYSCOMMAND = 0x0112;
-        //public const int SC_CLOSE = 0xF060;
-
-        //private void closeWindow()
-        //{
-        //    // retrieve the handler of the window  
-        //    int iHandle = FindWindow("Notepad", "Untitled - Notepad");
-        //    if (iHandle > 0)
-        //    {
-        //        // close the window using API        
-        //        SendMessage(iHandle, WM_SYSCOMMAND, SC_CLOSE, 0);
-        //    }
-        //}
-        [DllImport("user32.dll")]
-        static extern int FindWindow(string lpClassName, string lpWindowName);
-        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
-        static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-        [DllImport("user32.dll")]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
-        [DllImport("user32.dll")]
-        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-        public const int WM_SYSCOMMAND = 0x0112;
-        public const int SC_CLOSE = 0xF060;
-        const UInt32 WM_CLOSE = 0x0010;
-
         //flags to let the code know if the user hit the 'Abort' button, if the optimization loop is finished, and if the GUI can close safely (you don't want to close it if the background thread hasn't stopped working)
         public bool abortOpt;
         public bool isFinished;
         public bool canClose;
         //flag that controls whether the code is run in 'Demo' mode. In demo mode, no coverage check, VMAT optimization, or dose calculations are performed. Instead, these statements have been replaced with Thread.Sleep(3000), which 
         //tells the code to 'sleep' for 3 seconds
-        private bool demo = false;
+        private bool demo;
         //total number of calculations/items that need to be completed during the optimization loop
         public int calcItems;
         //used to copy the instances of the background thread and the optimizationLoop class
@@ -74,8 +41,12 @@ namespace VMATTBI_optLoop
         string id = "";
         //MLC model number used as an argument to the optimizeVMAT method
         string MLCmodel = "";
+        //path to where the log files should be written
+        string logPath = "";
 
         //used for progress reporting
+        string optPlanObjHeader = "";
+        string optRequestTS = "";
         string optObjHeader = "";
         string optResHeader = "";
         //get instances of the stopwatch and dispatch timer to report how long the calculation takes at each reporting interval
@@ -97,9 +68,25 @@ namespace VMATTBI_optLoop
             //copy the patient MRN so the script will always write the output to my folder (so I don't have to worry about users forgetting to save the output)
             id = slave.data.id;
 
+            //demo status
+            demo = slave.data.isDemo;
+
+            //copy log path
+            logPath = slave.data.logFilePath;
+
             //MLC model
             MLCmodel = slave.data.MLCmodel;
 
+            optPlanObjHeader = " Plan objectives:" + System.Environment.NewLine;
+            optPlanObjHeader += " --------------------------------------------------------------------------" + System.Environment.NewLine;
+            optPlanObjHeader += String.Format(" {0, -15} | {1, -16} | {2, -10} | {3, -10} | {4, -9} |", "structure Id", "constraint type", "dose", "volume (%)", "dose type") + System.Environment.NewLine;
+            optPlanObjHeader += " --------------------------------------------------------------------------" + System.Environment.NewLine;
+
+            optRequestTS += String.Format("Requested tuning structures:") + System.Environment.NewLine;
+            optRequestTS += " --------------------------------------------------------------------------" + System.Environment.NewLine;
+            optRequestTS += String.Format(" {0, -15} | {1, -9} | {2, -10} | {3, -5} | {4, -8} | {5, -10} |", "structure Id", "low D (%)", "high D (%)", "V (%)", "priority", "constraint") + System.Environment.NewLine;
+            optRequestTS += " --------------------------------------------------------------------------" + System.Environment.NewLine;
+            
             //setup formating for progress window output text
             optObjHeader = " Updated optimization constraints:" + System.Environment.NewLine;
             optObjHeader += " -------------------------------------------------------------------------" + System.Environment.NewLine;
@@ -200,6 +187,47 @@ namespace VMATTBI_optLoop
                         + " I'm assuming you want to include flash in the optimization! Stop the loop if this is a mistake!" + System.Environment.NewLine);
                     Dispatcher.BeginInvoke((Action)(() => { provideUpdate(message); }));
                 }
+
+
+                //structure, dvh data, current dose obj, dose diff^2, cost, current priority, priority difference
+                string planObjectives = System.Environment.NewLine;
+                planObjectives += optPlanObjHeader;
+                foreach (Tuple<string,string,double,double,DoseValuePresentation> itr in d.planObj)
+                {
+                    //"structure Id", "constraint type", "dose (cGy or %)", "volume (%)", "Dose display (absolute or relative)"
+                    planObjectives += String.Format(" {0, -15} | {1, -16} | {2,-10:N1} | {3,-10:N1} | {4,-9} |" + System.Environment.NewLine, itr.Item1, itr.Item2, itr.Item3, itr.Item4, itr.Item5);
+                }
+                Dispatcher.BeginInvoke((Action)(() => { provideUpdate(planObjectives); }));
+
+                //print requested tuning structures
+                string TSstructures = System.Environment.NewLine;
+                TSstructures += optRequestTS;
+                foreach (Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>> itr in d.requestedTSstructures)
+                {
+                    TSstructures += String.Format(" {0, -15} | {1, -9:N1} | {2,-10:N1} | {3,-5:N1} | {4,-8} |", itr.Item1, itr.Item2, itr.Item3, itr.Item4, itr.Item5);
+                    if (!itr.Item6.Any()) TSstructures += String.Format(" {0,-10} |", "none") + System.Environment.NewLine;
+                    else
+                    {
+                        int index = 0;
+                        foreach (Tuple<string, double, string, double> itr1 in itr.Item6)
+                        {
+                            if (index == 0)
+                            {
+                                if (itr1.Item1.Contains("Dmax")) TSstructures += String.Format(" {0,-10} |", String.Format("{0}{1}{2}%", itr1.Item1, itr1.Item3, itr1.Item4)) + System.Environment.NewLine;
+                                else if (itr1.Item1.Contains("V")) TSstructures += String.Format(" {0,-10} |", String.Format("{0}{1}%{2}{3}%", itr1.Item1, itr1.Item2, itr1.Item3, itr1.Item4)) + System.Environment.NewLine;
+                                else TSstructures += String.Format(" {0,-10} |", String.Format("{0}", itr1.Item1)) + System.Environment.NewLine;
+                            }
+                            else
+                            {
+                                if (itr1.Item1.Contains("Dmax")) TSstructures += String.Format(" {0,-59} | {1,-10} |", " ", String.Format("{0}{1}{2}%", itr1.Item1, itr1.Item3, itr1.Item4)) + System.Environment.NewLine;
+                                else if (itr1.Item1.Contains("V")) TSstructures += String.Format(" {0,-59} | {1,-10} |", " ", String.Format("{0}{1}%{2}{3}%", itr1.Item1, itr1.Item2, itr1.Item3, itr1.Item4)) + System.Environment.NewLine;
+                                else TSstructures += String.Format(" {0,-59} | {1,-10} |", " ", String.Format("{0}", itr1.Item1)) + System.Environment.NewLine;
+                            }
+                            index++;
+                        }
+                    }
+                }
+                Dispatcher.BeginInvoke((Action)(() => { provideUpdate(TSstructures); }));
 
                 //update the progress in the message window and the percent completion in the GUI
                 Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), " Primilary checks passed"); }));
@@ -347,7 +375,7 @@ namespace VMATTBI_optLoop
 
                     Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), " Plan normalized! Evaluating plan quality and updating constraints!"); }));
                     //evaluate the new plan for quality and make any adjustments to the optimization parameters
-                    optimizationLoop.evalStruct e = op.evaluateAndUpdatePlan(d.plan, d.optParams, d.scleroTrial, d.planObjSclero, d.planObjGeneral, d.threshold, d.lowDoseLimit);
+                    optimizationLoop.evalStruct e = op.evaluateAndUpdatePlan(d.plan, d.optParams, d.planObj, d.requestedTSstructures, d.threshold, d.lowDoseLimit, (d.oneMoreOpt && ((count + 1) == d.numOptimizations)));
 
                     //updated optimization constraint list is empty, which means that all plan objectives have been met. Let the user know and break the loop. Also set oneMoreOpt to false so that extra optimization is not performed
                     if (!e.updatedObj.Any())
@@ -378,7 +406,7 @@ namespace VMATTBI_optLoop
                     optResults += optResHeader;
                     int index = 0;
                     //structure, dvh data, current dose obj, dose diff^2, cost, current priority, priority difference
-                    foreach (Tuple<Structure, DVHData, double, double, double, int, int> itr in e.diffPlanOpt)
+                    foreach (Tuple<Structure, DVHData, double, double, double, int> itr in e.diffPlanOpt)
                     {
                         string id = "";
                         //grab the structure id from the optParams list (better to work with string literals rather than trying to access the structure id through the structure object instance in the diffPlanOpt data structure)
@@ -406,15 +434,15 @@ namespace VMATTBI_optLoop
                     //this is basically here to avoid having to call op.updateConstraints a second time (if this batch of code was placed outside of the loop)
                     if (d.oneMoreOpt && ((count + 1) == d.numOptimizations))
                     {
-                        //go through the current list of optimization objects and add all of them to finalObj vector. Do not modify any objective except for ts_cooler where we will find the maximum priority
-                        //for all structures in the optimization parameter list and assign it to ts_cooler. In addition, the dose objective for ts_cooler will be reduced to 101% of the prescription dose.
-                        //This really pushes the optimizer to reduce the dose in these hotspots
+                        //go through the current list of optimization objects and add all of them to finalObj vector. ADD COMMENTS!
                         List<Tuple<string, string, double, double, int>> finalObj = new List<Tuple<string, string, double, double, int>> { };
                         foreach (Tuple<string, string, double, double, int> itr in e.updatedObj)
                         {
                             //get maximum priority and assign it to the cooler structure to really push the hotspot down. Also lower dose objective
                             if (itr.Item1.ToLower().Contains("ts_cooler"))
-                                finalObj.Add(new Tuple<string, string, double, double, int>(itr.Item1, itr.Item2, 1.01 * d.plan.TotalDose.Dose, itr.Item4, e.updatedObj.Max(x => x.Item5)));
+                            {
+                                finalObj.Add(new Tuple<string, string, double, double, int>(itr.Item1, itr.Item2, 0.98*itr.Item3, itr.Item4, Math.Max(itr.Item5, (int)(0.9*(double)e.updatedObj.Max(x => x.Item5)))));
+                            }
                             else finalObj.Add(itr);
                         }
                         //set e.updatedObj to be equal to finalObj
@@ -527,21 +555,8 @@ namespace VMATTBI_optLoop
                         if (demo) Thread.Sleep(3000);
                         else
                         {
-                            foreach (ExternalPlanSetup p in plansWithCalcDose)
-                            {
-                                p.CalculateDose();
-                                //if(!p.Id.ToLower().Contains("_vmat tbi"))
-                                //{
-                                //    const int nChars = 256;
-                                //    StringBuilder Buff = new StringBuilder(nChars);
-                                //    IntPtr handle = GetForegroundWindow();
-                                //    if (GetWindowText(handle, Buff, nChars) > 0) if (Buff.ToString().ToLower().Contains("warning") || Buff.ToString().ToLower().Contains("calculation"))
-                                //        {
-                                //            SendMessage(handle, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
-                                //            Dispatcher.BeginInvoke((Action)(() => { provideUpdate(" Warning window appeared from Eclipse! Closing the window!"); }));
-                                //        }
-                                //}
-                            }
+                            foreach (ExternalPlanSetup p in plansWithCalcDose) p.CalculateDose();
+
                         }
                         Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), " Dose calculated, normalizing plan!"); }));
                         Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Elapsed time: {0}", currentTime)); }));
@@ -630,10 +645,10 @@ namespace VMATTBI_optLoop
             //this is here to check if the directory and file already exist. An alternative method would be to create a streamwriter in the constructor of this class, but because this program runs for several hours and I have no
             //control over the shared drive, there may be a situation where the streamwriter is created and wants to write to the file after a few hours and (for whatever reason) the directory/file is gone. In this case, it would likely
             //crash the program
-            if (Directory.Exists(@"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\Users\ESimiele\Research\VMAT_TBI\log_files"))
+            if (Directory.Exists(logPath))
             {
                 output += System.Environment.NewLine;
-                string fileName = @"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\Users\ESimiele\Research\VMAT_TBI\log_files\" + id + ".txt";
+                string fileName = logPath + id + ".txt";
                 File.AppendAllText(fileName, output);
             }
         }
@@ -643,7 +658,7 @@ namespace VMATTBI_optLoop
         {
             SaveFileDialog saveFileDialog1 = new SaveFileDialog
             {
-                InitialDirectory = @"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 Title = "Choose text file output",
                 CheckPathExists = true,
 
@@ -680,14 +695,6 @@ namespace VMATTBI_optLoop
             sw.Stop();
             dt.Stop();
             Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Total run time: {0}", currentTime)); }));
-
-            //always write the results to my folder. That way I don't have to worry about users saving the results of the optimization so I can review them if there is a problem
-            //if (Directory.Exists(@"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\Users\ESimiele\Research\VMAT_TBI\log_files"))
-            //{
-            //    string output = update.Text;
-            //    string fileName = @"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\Users\ESimiele\Research\VMAT_TBI\log_files\" + id + ".txt";
-            //    File.WriteAllText(fileName, output);
-            //}
 
             canClose = true;
         }

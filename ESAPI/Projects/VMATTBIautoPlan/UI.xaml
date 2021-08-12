@@ -101,6 +101,15 @@
                     <Label Content="More features coming in v16!" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" Margin="0,75,0,0"></Label>
                 </StackPanel>
             </TabItem>
+            <TabItem Header="Script Configuration" HorizontalContentAlignment="Center" Margin="66,-2,-70,0">
+                <StackPanel Name="configuration">
+                    <Label Content="Current Script Configuration Parameters" FontSize="20" FontStyle="Normal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0"></Label>
+                    <ScrollViewer x:Name ="configScroller" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="575" Height="382" Margin="0,0,5,7" BorderBrush="Black">
+                        <TextBlock x:Name="configTB" FontSize="12" FontFamily="Courier New" Width="555" Background="White" TextWrapping="Wrap"></TextBlock>
+                    </ScrollViewer>
+                    <Button x:Name="loadNewConfigFile" Content="Load new configuration file" Width="160" HorizontalAlignment="Center" Click="loadNewConfigFile_Click"></Button>
+                </StackPanel>
+            </TabItem>
 
         </TabControl>
         <Label Content="VMAT TBI auto planning script" FontSize="20" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top"/>

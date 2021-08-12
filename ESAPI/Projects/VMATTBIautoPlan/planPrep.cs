@@ -145,6 +145,8 @@ namespace VMATTBIautoPlan
                 }
                 names.Add("AP / PA upper legs");
                 if (numIsos - numVMATIsos == 2) names.Add("AP / PA lower legs");
+                //greater than 2 AP/pA isos (it happened once...)
+                else if (numIsos - numVMATIsos > 2) { names.Add("AP / PA Mid legs"); names.Add("AP / PA lower legs"); }
             }
 
             //get the user origin in user coordinates
@@ -187,7 +189,7 @@ namespace VMATTBIautoPlan
             double TT = 0;
             //check if couch is present. Warn if not found, otherwise it is the separation between the the beam isocenter position and the minimum y-position of the couch surface (in dicom coordinates)
             if (couchSurface == null) MessageBox.Show("Warning! No couch surface structure found!");
-            else TT = -(couchSurface.MeshGeometry.Positions.Min(p => p.Y) - vmatPlan.Beams.First(x => !x.IsSetupField).IsocenterPosition.y) / 10;
+            else TT = (vmatPlan.Beams.First(x => !x.IsSetupField).IsocenterPosition.y - couchSurface.MeshGeometry.Positions.Min(p => p.Y)) / 10;
 
             //create the message
             string message = "";

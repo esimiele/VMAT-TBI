@@ -46,17 +46,6 @@ namespace VMATTBIautoPlan
         private double contourOverlapMargin;
         public List<Structure> jnxs = new List<Structure> { };
 
-        //[DllImport("user32.dll")]
-        //static extern int FindWindow(string lpClassName, string lpWindowName);
-        //[DllImport("user32.dll")]
-        //public static extern int SendMessage(int hWnd, uint Msg, int wParam, int lParam);
-        //[DllImport("user32.dll")]
-        //private static extern IntPtr GetForegroundWindow();
-        //[DllImport("user32.dll")]
-        //static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-        //public const int WM_SYSCOMMAND = 0x0112;
-        //public const int SC_CLOSE = 0xF060;
-
         public placeBeams(StructureSet ss, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, string linac, string energy, string calcModel, bool flash)
         {
             selectedSS = ss;
@@ -158,6 +147,7 @@ namespace VMATTBIautoPlan
                 }
             }
             plan.SetCalculationModel(CalculationType.PhotonVolumeDose, calculationModel);
+            plan.SetCalculationModel(CalculationType.PhotonVMATOptimization, "PO_15605");
 
             //reference point can only be added for a plan that IS CURRENTLY OPEN
             //plan.AddReferencePoint(selectedSS.Structures.First(x => x.Id == "TS_PTV_VMAT"), null, "VMAT TBI", "VMAT TBI");
@@ -169,7 +159,7 @@ namespace VMATTBIautoPlan
                 return true;
             }
 
-            //these needs to be fixed
+            //these need to be fixed
             //v16 of Eclipse allows for the creation of a plan with a named target structure and named primary reference point. Neither of these options are available in v15
             //plan.TargetVolumeID = selectedSS.Structures.First(x => x.Id == "TS_PTV_VMAT");
             //plan.PrimaryReferencePoint = plan.ReferencePoints.Fisrt(x => x.Id == "VMAT TBI");
@@ -505,18 +495,6 @@ namespace VMATTBIautoPlan
                         b.CreateOrReplaceDRR(DRR);
                     }
                 }
-                //MessageBox.Show("calculating dose");
-                //legs_planUpper.CalculateDose();
-                //const int nChars = 256;
-                //StringBuilder Buff = new StringBuilder(nChars);
-                //IntPtr handle = GetForegroundWindow();
-
-                //if (GetWindowText(handle, Buff, nChars) > 0)
-                //{
-                //    MessageBox.Show(Buff.ToString());
-                    
-                //}
-
             }
             MessageBox.Show("Beams placed successfully!\nPlease proceed to the optimization setup tab!");
         }

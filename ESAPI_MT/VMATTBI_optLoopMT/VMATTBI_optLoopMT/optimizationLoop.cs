@@ -8,7 +8,6 @@ using System.Windows.Threading;
 using System.Threading;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
-//using System.Runtime.InteropServices;
 
 namespace VMATTBI_optLoop
 {
@@ -23,19 +22,20 @@ namespace VMATTBI_optLoop
         public int numOptimizations;
         public double targetVolCoverage;
         public double relativeDose;
-        public bool scleroTrial;
         public bool runCoverageCheck;
         public bool oneMoreOpt;
         public bool copyAndSavePlanItr;
         public bool useFlash;
         public List<Tuple<string, string, double, double, int>> optParams;
-        public List<Tuple<string, string, double, double, DoseValuePresentation>> planObjSclero;
-        public List<Tuple<string, string, double, double, DoseValuePresentation>> planObjGeneral;
+        public List<Tuple<string, string, double, double, DoseValuePresentation>> planObj;
+        public List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> requestedTSstructures;
         public double threshold;
         public double lowDoseLimit;
-        private string targetId;
+        public bool isDemo;
+        public string logFilePath;
         //simple method to automatically assign/initialize the above data members
-        public void construct(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, double targetNorm, int numOpt, bool sc, bool coverMe, bool unoMas, bool copyAndSave, bool flash, string mlc, VMS.TPS.Common.Model.API.Application a)
+        public void construct(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, List<Tuple<string,string,double,double,DoseValuePresentation>> objectives, List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> RTS,
+                              double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, string mlc, double thres, double lowDose, bool demo, string logPath, VMS.TPS.Common.Model.API.Application a)
         {
             optParams = new List<Tuple<string, string, double, double, int>> { };
             optParams = param;
@@ -43,8 +43,11 @@ namespace VMATTBI_optLoop
             plan = p;
             id = plan.Course.Patient.Id;
             numOptimizations = numOpt;
-            scleroTrial = sc;
 
+            //log file path
+            logFilePath = logPath;
+            //run the optimization loop as a demo
+            isDemo = demo;
             //what percentage of the target volume should recieve the prescription dose
             targetVolCoverage = targetNorm;
             //MLC model
@@ -53,10 +56,10 @@ namespace VMATTBI_optLoop
             relativeDose = 100.0;
             //threshold to determine if the dose or the priority should be adjusted for an optimization constraint. This threshold indicates the relative cost, above which, the dose will be decreased for an optimization constraint.
             //Below the threshold, the priority will be increased for an optimization constraint. 
-            threshold = 0.15;
-            //the low dose limit is used to prevent the algorithm (below) from pushing the dose constraints too low. Basically, if the difference in the calculated dose from the previous optimization and the proposed change in the dose
+            threshold = thres;
+            //the low dose limit is used to prevent the algorithm (below) from pushing the dose constraints too low. Basically, if the proposed new dose (i.e., calculated dose from the previous optimization minus the proposed dose decrement)
             //is greater than the prescription dose times the lowDoseLimit, the change is accepted and the dose constraint is modified. Otherwise, the optimization constraint is NOT altered
-            lowDoseLimit = 0.1;
+            lowDoseLimit = lowDose;
             //copy additional optimization loop parameters
             runCoverageCheck = coverMe;
             oneMoreOpt = unoMas;
@@ -64,44 +67,8 @@ namespace VMATTBI_optLoop
             useFlash = flash;
             app = a;
 
-            //used to set the correct target id based on whether the user included flash in their optimization
-            if (useFlash) targetId = "TS_PTV_FLASH";
-            else targetId = "TS_PTV_VMAT";
-
-            //changed PTV_BODY to targetId for the cases where the patient has an appa plan and needs to ts_PTV_VMAT or ts_PTV_FLASH (if flash was used) structure
-            planObjSclero = new List<Tuple<string, string, double, double, DoseValuePresentation>>
-            {
-                //structure, constraint type, dose, relative volume
-                //new Tuple<string, string, double, double, DoseValuePresentation>("PTV_Body", "Lower", 800.0, 90.0, DoseValuePresentation.Absolute),
-                //new Tuple<string, string, double, double, DoseValuePresentation>("PTV_Body", "Upper", 810.0, 0.0, DoseValuePresentation.Absolute),
-                new Tuple<string, string, double, double, DoseValuePresentation>(targetId, "Lower", 800.0, 90.0, DoseValuePresentation.Absolute),
-                new Tuple<string, string, double, double, DoseValuePresentation>(targetId, "Upper", 810.0, 0.0, DoseValuePresentation.Absolute),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Lungs_Eval", "Mean", 200.0, 0.0, DoseValuePresentation.Absolute),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Kidneys", "Mean", 200.0, 0.0, DoseValuePresentation.Absolute)
-            };
-            //generic plan objectives for all treatment regiments
-            planObjGeneral = new List<Tuple<string, string, double, double, DoseValuePresentation>>
-            {
-                //structure, constraint type, relative dose, relative volume (unless otherwise specified)
-                //note, if the constraint type is "mean", the relative volume value is ignored
-                //new Tuple<string, string, double, double, DoseValuePresentation>("PTV_Body", "Lower", 100.0, 90.0, DoseValuePresentation.Relative),
-                //new Tuple<string, string, double, double, DoseValuePresentation>("PTV_Body", "Upper", 120.0, 0.0, DoseValuePresentation.Relative),
-                //new Tuple<string, string, double, double, DoseValuePresentation>("PTV_Body", "Upper", 110.0, 5.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>(targetId, "Lower", 100.0, 90.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>(targetId, "Upper", 120.0, 0.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>(targetId, "Upper", 110.0, 5.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Lungs", "Mean", 60.0, 0.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Lungs-1cm", "Mean", 45.0, 0.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Kidneys", "Upper", 105.0, 0.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Kidneys", "Mean", 60.0, 0.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Bowel", "Upper", 105.0, 0.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Testes", "Upper", 100.0, 0.0, DoseValuePresentation.Absolute), //these doses are in cGy, not percentage!
-                new Tuple<string, string, double, double, DoseValuePresentation>("Testes", "Mean", 25.0, 0.0, DoseValuePresentation.Relative), 
-                new Tuple<string, string, double, double, DoseValuePresentation>("Ovaries", "Upper", 100.0, 0.0, DoseValuePresentation.Absolute), //these doses are in cGy, not percentage!
-                new Tuple<string, string, double, double, DoseValuePresentation>("Ovaries", "Mean", 25.0, 0.0, DoseValuePresentation.Relative), 
-                new Tuple<string, string, double, double, DoseValuePresentation>("Brain-1cm", "Mean", 75.0, 0.0, DoseValuePresentation.Relative),
-                new Tuple<string, string, double, double, DoseValuePresentation>("Thyroid", "Mean", 75.0, 0.0, DoseValuePresentation.Relative)
-            };
+            planObj = objectives;
+            requestedTSstructures = RTS;
         }
     }
 
@@ -130,44 +97,11 @@ namespace VMATTBI_optLoop
 
     public class optimizationLoop
     {
-        //[DllImport("user32.dll")]
-        //static extern int FindWindow(string lpClassName, string lpWindowName);
-        //[DllImport("user32.dll")]
-        //public static extern int SendMessage(int hWnd, uint Msg, int wParam, int lParam);
-        //public const int WM_SYSCOMMAND = 0x0112;
-        //public const int SC_CLOSE = 0xF060;
-
-        //private void closeWindow()
-        //{
-        //    // retrieve the handler of the window  
-        //    int iHandle = FindWindow("Notepad", "Untitled - Notepad");
-        //    if (iHandle > 0)
-        //    {
-        //        // close the window using API        
-        //        SendMessage(iHandle, WM_SYSCOMMAND, SC_CLOSE, 0);
-        //    }
-        //}
-        //[DllImport("user32.dll")]
-        //static extern int FindWindow(string lpClassName, string lpWindowName);
-        //[DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
-        //static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
-        //[DllImport("user32.dll", CharSet = CharSet.Auto)]
-        //static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
-        //[DllImport("user32.dll")]
-        //private static extern IntPtr GetForegroundWindow();
-        //[DllImport("user32.dll")]
-        //static extern bool SetForegroundWindow(IntPtr hWnd);
-        //[DllImport("user32.dll")]
-        //static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-        //public const int WM_SYSCOMMAND = 0x0112;
-        //public const int SC_CLOSE = 0xF060;
-        //const UInt32 WM_CLOSE = 0x0010;
-
         //data structure to hold the results of the plan evaluation following an optimization
         public struct evalStruct
         {
             //difference between current dose values for each structure in the optimization list and the optimization constraint(s) for that structure
-            public List<Tuple<Structure, DVHData, double, double, double, int, int>> diffPlanOpt;
+            public List<Tuple<Structure, DVHData, double, double, double, int>> diffPlanOpt;
             //same for plan objectives
             public List<Tuple<Structure, DVHData, double, double>> diffPlanObj;
             //vector to hold the updated optimization objectives (to be assigned to the plan)
@@ -183,7 +117,7 @@ namespace VMATTBI_optLoop
             {
                 //vector to hold the results from the optimization for a particular OPTIMIZATION objective
                 //structure, dvh data, current dose obj, dose diff^2, cost, current priority, priority difference
-                diffPlanOpt = new List<Tuple<Structure, DVHData, double, double, double, int, int>> { };
+                diffPlanOpt = new List<Tuple<Structure, DVHData, double, double, double, int>> { };
                 //vector to hold the results from the optimization for a particular PLAN objective
                 diffPlanObj = new List<Tuple<Structure, DVHData, double, double>> { };
                 //vector to hold the updated optimization objectives (following adjustment in the evaluateAndUpdatePlan method)
@@ -192,11 +126,12 @@ namespace VMATTBI_optLoop
             }
         }
 
-        public optimizationLoop(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, double targetNorm, int numOpt, bool sc, bool coverMe, bool unoMas, bool copyAndSave, bool flash, string MLC, VMS.TPS.Common.Model.API.Application a)
+        public optimizationLoop(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, List<Tuple<string, string, double, double, DoseValuePresentation>> objectives, List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> RTS,
+                                double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, string MLC, double thres, double lowDose, bool demo, string log, VMS.TPS.Common.Model.API.Application a)
         {
             //create a new instance of the structure dataContainer and assign the optimization loop parameters entered by the user to the various data members
             dataContainer d = new dataContainer();
-            d.construct(p, param, targetNorm, numOpt, sc, coverMe, unoMas, copyAndSave, flash, MLC, a);
+            d.construct(p, param, objectives, RTS, targetNorm, numOpt, coverMe, unoMas, copyAndSave, flash, MLC, thres, lowDose, demo, log, a);
 
             //create a new thread and pass it the data structure created above (it will copy this information to its local thread memory)
             ESAPIworker slave = new ESAPIworker(d);
@@ -250,26 +185,26 @@ namespace VMATTBI_optLoop
                 return true;
             }
 
-            //check each beam to ensure its z-position is rounded-off to the nearest integer. Ensure the x,y positions are both 0 within +/- 1e-6 cm (need small tolerance due to possible rounding errors in eclipse)
+            //check each beam to ensure its z-position is rounded-off to the nearest integer. Ensure the x,y positions are both 0 within +/- 1e-3 cm (need small tolerance due to possible rounding errors in eclipse)
             foreach (Beam b in plan.Beams)
             {
                 VVector pos = b.IsocenterPosition;
                 pos = plan.StructureSet.Image.DicomToUser(pos, plan);
                 //the first argument checks if the rounding error is JUST OVER the nearest integer and the second argument checks if the rounding error is JUST UNDER the nearest integer
-                if (pos.x % 1 > 1e-6 && Math.Abs((pos.x % 1) - 1) > 1e-6)
+                if (pos.x % 1 > 1e-3 && Math.Abs((pos.x % 1) - 1) > 1e-3)
                 {
                     MessageBox.Show(String.Format("x, y, z, z % 1, abs((z % 1) - 1), beam id \n{0}, {1}, {2}, {3}, {4}, {5}", pos.x, pos.y, pos.z, pos.z % 1, Math.Abs((pos.z % 1) - 1), b.Id));
                     MessageBox.Show("X position of isocenters are NOT rounded off! Exiting!");
                     return true;
                 }
-                if (pos.y % 1 > 1e-6 && Math.Abs((pos.y % 1) - 1) > 1e-6)
+                if (pos.y % 1 > 1e-3 && Math.Abs((pos.y % 1) - 1) > 1e-3)
                 {
                     MessageBox.Show(String.Format("x, y, z, z % 1, abs((z % 1) - 1), beam id \n{0}, {1}, {2}, {3}, {4}, {5}", pos.x, pos.y, pos.z, pos.z % 1, Math.Abs((pos.z % 1) - 1), b.Id));
                     MessageBox.Show("Y position of isocenters are NOT rounded off! Exiting!");
                     return true;
                 }
                 //if pos.z % 1 is not zero, check to see if rounded difference between pos.z % 1 and 1 is > 1 nm (basically check for an internal rounding error in the program). If so, throw an error.
-                if (pos.z % 1 > 1e-6 && Math.Abs((pos.z % 1) - 1) > 1e-6)
+                if (pos.z % 1 > 1e-3 && Math.Abs((pos.z % 1) - 1) > 1e-3)
                 {
                     MessageBox.Show(String.Format("x, y, z, z % 1, abs((z % 1) - 1), beam id \n{0}, {1}, {2}, {3}, {4}, {5}", pos.x, pos.y, pos.z, pos.z % 1, Math.Abs((pos.z % 1)-1), b.Id));
                     MessageBox.Show("Z positions of isocenters are NOT rounded-off! Exiting!");
@@ -404,19 +339,6 @@ namespace VMATTBI_optLoop
                 }
             }
 
-            //ExternalPlanSetup legs_planUpper = plan.Course.ExternalPlanSetups.FirstOrDefault(x => x.Id.ToLower().Contains("legs"));
-            //MessageBox.Show("calculating dose");
-            //legs_planUpper.CalculateDose();
-            //const int nChars = 256;
-            //StringBuilder Buff = new StringBuilder(nChars);
-            //IntPtr handle = GetForegroundWindow();
-            ////MessageBox.Show(GetWindowText(handle, Buff, nChars).ToString());
-            //if (GetWindowText(handle, Buff, nChars) > 0)
-            //{
-            //    MessageBox.Show(Buff.ToString());
-            //    //SendMessage(handle, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
-            //}
-
             //turn on jaw tracking
             plan.OptimizationSetup.UseJawTracking = true;
             //set auto NTO priority to zero (i.e., shut it off)
@@ -430,7 +352,8 @@ namespace VMATTBI_optLoop
 //**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
 // ADJUST THIS CODE IF YOU WANT TO CHANGE HOW THE PROGRAM ADJUSTS THE OPTIMIZATION CONSTRAINTS AFTER EACH ITERATION
 //**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-        public evalStruct evaluateAndUpdatePlan(ExternalPlanSetup plan, List<Tuple<string, string, double, double, int>> optParams, bool scleroTrial, List<Tuple<string, string, double, double, DoseValuePresentation>> planObjSclero, List<Tuple<string, string, double, double, DoseValuePresentation>> planObjGeneral, double threshold, double lowDoseLimit)
+        public evalStruct evaluateAndUpdatePlan(ExternalPlanSetup plan, List<Tuple<string, string, double, double, int>> optParams, List<Tuple<string, string, double, double, DoseValuePresentation>> planObj, 
+                                                List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> requestedTSstructures, double threshold, double lowDoseLimit, bool finalOptimization)
         {
             //create a new data structure to hold the results of the plan quality evaluation
             evalStruct e = new evalStruct();
@@ -438,10 +361,6 @@ namespace VMATTBI_optLoop
 
             //get current optimization objectives from plan (we could use the optParams list, but we want the actual instances of the OptimizationObjective class so we can get the results from each objective)
             IEnumerable<OptimizationObjective> currentObj = plan.OptimizationSetup.Objectives;
-            //get overall plan objectives (either generic of scleroderma trial)
-            List<Tuple<string, string, double, double, DoseValuePresentation>> planObj = new List<Tuple<string, string, double, double, DoseValuePresentation>> { };
-            if (scleroTrial) planObj = planObjSclero;
-            else planObj = planObjGeneral;
 
             //counter to record the number of plan objective met
             int numPass = 0;
@@ -456,7 +375,8 @@ namespace VMATTBI_optLoop
                 if (plan.StructureSet.Structures.Where(x => x.Id.ToLower() == itr.Item1.ToLower()).Any() && !plan.StructureSet.Structures.First(x => x.Id.ToLower() == itr.Item1.ToLower()).IsEmpty)
                 {
                     //similar to code to the foreach loop used to cycle through the optimization parameters
-                    Structure s = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == itr.Item1.ToLower());
+                    Structure s = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == (itr.Item1.ToLower() + "_lowres"));
+                    if (s == null) s = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == itr.Item1.ToLower());
                     //this statement is difference from the dvh statement in the previous foreach loop because the dose is always expressed as an absolute value in the optimization objectives, but can be either relative or absolute in the plan objectives
                     //(itr.Item5 is the dose representation for this objective)
                     DVHData dvh = plan.GetDVHCumulativeData(s, itr.Item5, VolumePresentation.Relative, 0.1);
@@ -466,15 +386,21 @@ namespace VMATTBI_optLoop
 
                     //NOTE: THERE MAY BE CASES WHERE A STRUCTURE MIGHT HAVE A PLAN OBJECTIVE, BUT NOT AN OPTIMIZATION OBJECTIVE(e.g., ovaries). Check if the structure of interest also has an optimization objective. If so, this indicates the user actually wanted to spare this
                     //structure for this plan and we should increment the number of comparisons counter. In addition, we need to copy the objective priority from the optimization objective if there is one
-                    if (optParams.FirstOrDefault(x => x.Item1.ToLower() == itr.Item1.ToLower()) != null)
+                    if (optParams.FirstOrDefault(x => x.Item1.ToLower() == (itr.Item1.ToLower() + "_lowres")) != null || optParams.FirstOrDefault(x => x.Item1.ToLower() == itr.Item1.ToLower()) != null)
                     {
                         //If so, do a three-way comparison to find the correct optimization objective for this plan objective (compare based structureId, constraint type, and constraint volume). These three objectives will remain constant
                         //throughout the optimization process whereas the dose constraint will vary
                         IEnumerable<Tuple<string, string, double, double, int>> copyOpt = from p in optParams
-                                                                                          where p.Item1.ToLower() == itr.Item1.ToLower()
-                                                                                          where p.Item2.ToLower() == itr.Item2.ToLower()
+                                                                                          where p.Item1.ToLower() == (itr.Item1.ToLower() + "_lowres")
+                                                                                          where p.Item2.ToLower() == (itr.Item2.ToLower() + "_lowres")
                                                                                           where p.Item4 == itr.Item4
                                                                                           select p;
+
+                        if (copyOpt.ElementAtOrDefault(0) == null) copyOpt = from p in optParams
+                                                                             where p.Item1.ToLower() == itr.Item1.ToLower()
+                                                                             where p.Item2.ToLower() == itr.Item2.ToLower()
+                                                                             where p.Item4 == itr.Item4
+                                                                             select p;
 
                         //If the appropriate constraint was found, calculate the cost as the (dose diff)^2 * priority. Also 
                         if (copyOpt.ElementAtOrDefault(0) != null) optPriority = copyOpt.ElementAtOrDefault(0).Item5;
@@ -482,6 +408,7 @@ namespace VMATTBI_optLoop
                         //increment the number of comparisons since an optimization constraint was found
                         numComparisons++;
                     }
+                    //else MessageBox.Show(itr.Item1);
 
                     //similar code as above
                     if (itr.Item2.ToLower() == "upper")
@@ -509,12 +436,14 @@ namespace VMATTBI_optLoop
                     else cost = diff * diff * optPriority;
 
                     //add this comparison to the list and increment the running total of the cost for the plan objectives
-                    //MessageBox.Show(String.Format("{0}, {1}, {2}, {3}", s.Id, "something", diff * diff, cost));
-                    //message += String.Format("{0}, {1}, {2}, {3}", s.Id, "something", diff * diff, cost) + System.Environment.NewLine;
+                    //message += String.Format("{0}, {1}, {2}, {3}, {4}", s.Id, itr.Item2, itr.Item3, diff, cost) + System.Environment.NewLine;
                     e.diffPlanObj.Add(Tuple.Create(s, dvh, diff * diff, cost));
                     totalCostPlanObj += cost;
                 }
+                //else message += String.Format("No structure found for: {0}", itr.Item1) + System.Environment.NewLine;
             }
+            //message += String.Format("{0}, {1}", numPass, numComparisons);
+
             //MessageBox.Show(message);
             e.totalCostPlanObj = totalCostPlanObj;
             if (numPass == numComparisons) return e; //all constraints met, exiting
@@ -528,48 +457,7 @@ namespace VMATTBI_optLoop
                 Structure s = plan.StructureSet.Structures.First(x => x.Id.ToLower() == opt.Item1.ToLower());
                 //dose representation in optimization objectives is always absolute!
                 DVHData dvh = plan.GetDVHCumulativeData(s, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
-
                 double diff = 0.0;
-                int currentPriority = 0;
-
-                //double currentDose = 0.0;
-                //get the list of optimization objectives associated with the current structure associated with opt
-                //IEnumerable<OptimizationObjective> obj = currentObj.Where(x => x.StructureId.ToLower() == opt.Item1.ToLower());
-
-                //new method 7-29-2020
-                ////string message = "";
-                ////loop through each of the optimization objectives assigned to this particular structure (this code was verified on 7-29-2020 by comparing the resulting costs for each structure in a mock plan to the costs obtained using the code from v0.5)
-                //foreach (OptimizationObjective o in obj)
-                //{
-                //    // if (o.GetType().Equals(typeof(OptimizationMeanDoseObjective))) message += String.Format("It's a mean objective! {0}, {1}, {2}\n", (o as OptimizationMeanDoseObjective).StructureId, (o as OptimizationMeanDoseObjective).Dose, (o as OptimizationMeanDoseObjective).Priority);
-                //    // else if (o.GetType().Equals(typeof(OptimizationPointObjective))) message += String.Format("It's a point objective! {0}, {1}, {2}, {3}\n", (o as OptimizationPointObjective).StructureId, (o as OptimizationPointObjective).Operator, (o as OptimizationPointObjective).Dose, (o as OptimizationPointObjective).Priority);
-
-                //    if (o.GetType().Equals(typeof(OptimizationMeanDoseObjective)))
-                //    {
-                //        //this optimization constraint is a mean constraint. NOTE: IT IS ASSUMED THE MAXIMUM NUMBER OF MEAN CONSTRAINTS ASSIGNED TO A STRUCTURE = 1 (it doesn't make sense to assign multiple mean constraints to a structure as they would be conflicting).
-                //        if (opt.Item2.ToLower() == "mean")
-                //        {
-                //            //get the priority and dose values associated with this optimization objective then break the loop
-                //            currentPriority = (int)(o as OptimizationMeanDoseObjective).Priority;
-                //            currentDose = (o as OptimizationMeanDoseObjective).Dose.Dose;
-                //            break;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        //if it's not an mean objective, then it's a point optimization objective
-                //        OptimizationPointObjective op = (OptimizationPointObjective)o;
-                //        //it is not uncommon for structures to have multiple point objectives assigned to them. Therefore, we want to verify we have the correction point objective. We do this by ensuring the point objective operator (i.e., upper, lower, exact) is the same as the operator in our optimization parameter list and
-                //        //the volume associated with this point objective is the same as the volume in our optimization parameter list. Note the optimization parameter list was passed as an argument to this method.
-                //        if (op.Operator.ToString().ToLower() == opt.Item2.ToLower() && op.Volume == opt.Item4)
-                //        {
-                //            currentPriority = (int)op.Priority;
-                //            currentDose = op.Dose.Dose;
-                //            break;
-                //        }
-                //    }
-                //}
-                //MessageBox.Show(message);
 
                 //calculate the dose difference between the actual plan dose and the optimization dose constraint (separate based on constraint type). If the difference is less than 0, truncate the dose difference to 0
                 if (opt.Item2.ToLower() == "upper")
@@ -592,13 +480,9 @@ namespace VMATTBI_optLoop
                 //calculate the cost for this constraint as the dose difference squared times the constraint priority
                 double cost = diff * diff * opt.Item5;
 
-                //structure, dvh data, current dose obj, dose diff^2, cost, current priority, priority difference
-                //e.diffPlanOpt.Add(Tuple.Create(s, dvh, currentDose, diff * diff, cost, currentPriority, opt.Item5 - currentPriority));
-
-                //7-29-2020 Item7 of this tuple is NOT currently used! 
-                //I think the original intent was to compare the current priority against the original priority for the structure. 
-                //However, the code was subsequently modified such that optParams was updated at the each of each optimization loop iteration, so the original priority for each optimization objective was lost
-                e.diffPlanOpt.Add(Tuple.Create(s, dvh, opt.Item3, diff * diff, cost, opt.Item5, opt.Item5 - currentPriority));
+                //add the results to the diffPlanOpt list
+                //structure, dvh data, current dose obj, dose diff^2, cost, current priority
+                e.diffPlanOpt.Add(Tuple.Create(s, dvh, opt.Item3, diff * diff, cost, opt.Item5));
                 //add the cost for this constraint to the running total
                 totalCostPlanOpt += cost;
             }
@@ -609,7 +493,7 @@ namespace VMATTBI_optLoop
             //update optimization parameters based on how each of the structures contained in diffPlanOpt performed
             //string output = "";
             int count = 0;
-            foreach (Tuple<Structure, DVHData, double, double, double, int, int> itr in e.diffPlanOpt)
+            foreach (Tuple<Structure, DVHData, double, double, double, int> itr in e.diffPlanOpt)
             {
                 //placeholders
                 double relative_cost = 0.0;
@@ -637,7 +521,6 @@ namespace VMATTBI_optLoop
                         //OAR objective was less than threshold (or it was a ptv objective), adjust priority
                         //increase OAR objective priority by 100 times the relative cost of this objective
                         //increase PTV objective by 10 times the relative cost (need to have a much lower scaling factor, otherwise it will increase too rapidly)
-                        //newPriority += (int)Math.Ceiling(itr.Item7 * relative_cost);
                         double increase = 100 * relative_cost;
                         if (itr.Item1.Id.ToLower().Contains("ptv")) increase /= 10;
                         newPriority += (int)Math.Ceiling(increase);
@@ -655,37 +538,45 @@ namespace VMATTBI_optLoop
             //update cooler and heater structures for optimization
             //first remove existing structures
             removeCoolHeatStructures(plan);
+            
             //now create new cooler and heating structures
-            double doseLevel = 1.10;
-            int priority = 80;
-            Tuple<string, string, double, double, int> cooler = generateCooler(plan, doseLevel, String.Format("TS_cooler{0}", (int)(doseLevel * 100)), priority);
-            if (cooler != null)
-            {
-                e.updatedObj.Add(cooler);
-                e.numAddedStructs++;
-            }
             Structure target = null;
             if (plan.OptimizationSetup.Objectives.Where(x => x.StructureId.ToLower() == "ts_ptv_flash").Any()) target = plan.StructureSet.Structures.First(x => x.Id.ToLower() == "ts_ptv_flash");
             else target = plan.StructureSet.Structures.First(x => x.Id.ToLower() == "ts_ptv_vmat");
-            double doseLevelLow = 0.90;
-            double doseLevelHigh = 1.0;
-            priority = 60;
-            Tuple<string, string, double, double, int> heater = generateHeater(plan, target, doseLevelLow, doseLevelHigh, String.Format("TS_heater{0}", (int)(doseLevelLow * 100)), priority);
-            if (heater != null)
+            foreach (Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>> itr in requestedTSstructures)
             {
-                e.updatedObj.Add(heater);
-                e.numAddedStructs++;
-            }
-            if(plan.Dose.DoseMax3D.Dose / plan.TotalDose.Dose > 1.40 || plan.GetVolumeAtDose(target, new DoseValue(110.0, DoseValue.DoseUnit.Percent), VolumePresentation.Relative) > 10.0)
-            {
-                doseLevelLow = 0.70;
-                doseLevelHigh = 0.90;
-                priority = 80;
-                Tuple<string, string, double, double, int> heater70 = generateHeater(plan, target, doseLevelLow, doseLevelHigh, String.Format("TS_heater{0}", (int)(doseLevelLow * 100)), priority);
-                if (heater70 != null)
+                bool addTSstruct = true;
+                Tuple<string, string, double, double, int> TSstructure = null;
+                //does it have constraints that need to be met before adding the TS structure?
+                if (itr.Item6.Any())
                 {
-                    e.updatedObj.Add(heater70);
-                    e.numAddedStructs++;
+                    foreach (Tuple<string, double, string, double> itr1 in itr.Item6)
+                    {
+                        if (itr1.Item1.Contains("Dmax"))
+                        {
+                            //dmax constraint
+                            if (plan.Dose.DoseMax3D.Dose / plan.TotalDose.Dose <= itr1.Item4 / 100) { addTSstruct = false; break; }
+                        }
+                        else if (itr1.Item1.Contains("V"))
+                        {
+                            //volume constraint
+                            if (itr1.Item3 == ">") { if (plan.GetVolumeAtDose(target, new DoseValue(itr1.Item2, DoseValue.DoseUnit.Percent), VolumePresentation.Relative) <= itr1.Item4) { addTSstruct = false; break; } }
+                            else { if (plan.GetVolumeAtDose(target, new DoseValue(itr1.Item2, DoseValue.DoseUnit.Percent), VolumePresentation.Relative) >= itr1.Item4) { addTSstruct = false; break; } }
+                        }
+                        else if(!finalOptimization) { addTSstruct = false; break; }
+                    }
+                }
+                if (addTSstruct)
+                {
+                    //cooler
+                    if (itr.Item1.Contains("cooler")) TSstructure = generateCooler(plan, itr.Item2 / 100, itr.Item4, itr.Item1, itr.Item5);
+                    //heater
+                    else TSstructure = generateHeater(plan, target, itr.Item2 / 100, itr.Item3 / 100, itr.Item4, itr.Item1, itr.Item5); 
+                    if (TSstructure != null) 
+                    { 
+                        e.updatedObj.Add(TSstructure); 
+                        e.numAddedStructs++; 
+                    }
                 }
             }
             //return the entire data structure
@@ -705,7 +596,7 @@ namespace VMATTBI_optLoop
         }
 //**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
 
-        private Tuple<string, string, double, double, int> generateCooler(ExternalPlanSetup plan, double doseLevel, string name, int priority)
+        private Tuple<string, string, double, double, int> generateCooler(ExternalPlanSetup plan, double doseLevel, double volume, string name, int priority)
         {
             //create an empty optiization objective
             Tuple<string, string, double, double, int> cooler = null;
@@ -718,12 +609,12 @@ namespace VMATTBI_optLoop
                 //add the cooler structure to the structure list and convert the doseLevel isodose volume to a structure. Add this new structure to the list with a max dose objective of Rx * 105% and give it a priority of 80
                 Structure coolerStructure = s.AddStructure("CONTROL", name);
                 coolerStructure.ConvertDoseLevelToStructure(d, dv);
-                cooler = Tuple.Create(name, "Upper", 1.05 * plan.TotalDose.Dose, 0.0, priority);
+                cooler = Tuple.Create(name, "Upper", doseLevel * plan.TotalDose.Dose, volume, priority);
             }
             return cooler;
         }
 
-        private Tuple<string, string, double, double, int> generateHeater(ExternalPlanSetup plan, Structure target, double doseLevelLow, double doseLevelHigh, string name, int priority)
+        private Tuple<string, string, double, double, int> generateHeater(ExternalPlanSetup plan, Structure target, double doseLevelLow, double doseLevelHigh, double volume, string name, int priority)
         {
             //similar to the generateCooler method
             Tuple<string, string, double, double, int> heater = null;
@@ -733,7 +624,6 @@ namespace VMATTBI_optLoop
             DoseValue dv = new DoseValue(doseLevelLow * plan.TotalDose.Dose, DoseValue.DoseUnit.cGy);
             if (s.CanAddStructure("CONTROL", name))
             {
-                //Structure target = s.Structures.First(x => x.Id.ToLower() == "ts_ptv_vmat");
                 //segment lower isodose volume
                 heaterStructure = s.AddStructure("CONTROL", name);
                 heaterStructure.ConvertDoseLevelToStructure(d, dv);
@@ -745,7 +635,8 @@ namespace VMATTBI_optLoop
                 heaterStructure.SegmentVolume = heaterStructure.And(target.SegmentVolume.Margin(0.0));
                 //subtract the higher isodose volume from the heater structure and assign it to the heater structure. This is the heater structure that will be used for optimization. Create a new optimization objective for this tunning structure
                 heaterStructure.SegmentVolume = heaterStructure.Sub(dummy.SegmentVolume.Margin(0.0));
-                heater = Tuple.Create(name, "Lower", plan.TotalDose.Dose, 100.0, priority);
+                //heaters generally need to increase the dose to regions of the target NOT receiving the Rx dose --> always set the dose objective to the Rx dose
+                heater = Tuple.Create(name, "Lower", plan.TotalDose.Dose, volume, priority);
                 //clean up
                 s.RemoveStructure(dummy);
                 //only keep the overlapping regions of the heater structure with the taget structure

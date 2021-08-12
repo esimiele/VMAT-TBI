@@ -12,6 +12,7 @@ namespace VMATTBIautoPlan
 {
     class generateTS
     {
+        //structure, sparing type, added margin
         public List<Tuple<string, string, double>> spareStructList = new List<Tuple<string, string, double>> { };
         StructureSet selectedSS;
         //DICOM types
@@ -216,13 +217,11 @@ namespace VMATTBIautoPlan
                     //foreach slice that contains contours, get the contours, and determine if you need to add or subtract the contours on the given image plane for the new low resolution structure. You need to subtract contours if the points lie INSIDE the current structure contour.
                     //We can sample three points (first, middle, and last points in array) to see if they are inside the current contour. If any of them are, subtract the set of contours from the image plane. Otherwise, add the contours to the image plane. NOTE: THIS LOGIC ASSUMES
                     //THAT YOU DO NOT OBTAIN THE CUTOUT CONTOUR POINTS BEFORE THE OUTER CONTOUR POINTS (it seems that ESAPI generally passes the main structure contours first before the cutout contours, but more testing is needed)
-                    //string data = "";
                     for (int slice = startSlice; slice < stopSlice; slice++)
                     {
                         VVector[][] points = s.GetContoursOnImagePlane(slice);
                         for (int i = 0; i < points.GetLength(0); i++)
                         {
-                            //for (int j = 0; j < points[i].GetLength(0); j++) data += String.Format("{0}, {1}, {2}", points[i][j].x, points[i][j].y, points[i][j].z) + System.Environment.NewLine;
                             if(lowRes.IsPointInsideSegment(points[i][0]) || lowRes.IsPointInsideSegment(points[i][points[i].GetLength(0) - 1]) || lowRes.IsPointInsideSegment(points[i][(int)(points[i].GetLength(0)/2)])) lowRes.SubtractContourOnImagePlane(points[i], slice);
                             else lowRes.AddContourOnImagePlane(points[i], slice);
                             //data += System.Environment.NewLine;
@@ -234,24 +233,9 @@ namespace VMATTBIautoPlan
                     spareStructList.RemoveAt(index);
                     spareStructList.Insert(index, new Tuple<string, string, double>(newName, highResSpareList.ElementAt(count).Item2, highResSpareList.ElementAt(count).Item3));
                     count++;
-
-                    //data += System.Environment.NewLine;
-                    //points = lowRes.GetContoursOnImagePlane((int)((stopSlice + startSlice) / 2));
-                    //for (int i = 0; i < points.GetLength(0); i++)
-                    //{
-                    //    for (int j = 0; j < points[i].GetLength(0); j++) data += String.Format("{0}, {1}, {2}", points[i][j].x, points[i][j].y, points[i][j].z) + System.Environment.NewLine;
-                    //    //data += System.Environment.NewLine;
-                    //}
-
-                    //File.WriteAllText(@"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\Users\ESimiele\vvectorData.txt", data);
                 }
                 //inform the main UI class that the UI needs to be updated
                 updateSparingList = true;
-                
-                //string mod = "";
-                //foreach (Tuple<string, string, double> itr in spareStructList) mod += String.Format("{0}, {1}, {2}", itr.Item1, itr.Item2, itr.Item3) + System.Environment.NewLine;
-                //MessageBox.Show(test);
-                //MessageBox.Show(mod);
             }
             return false;
         }
@@ -268,27 +252,30 @@ namespace VMATTBIautoPlan
             foreach (Tuple<string, string, double> itr in spareStructList)
             {
                 optParameters.Add(Tuple.Create(itr.Item1, itr.Item2));
-                if (itr.Item1.ToLower().Contains("lungs"))
+                if (itr.Item2 == "Mean Dose < Rx Dose")
                 {
-                    foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("lungs"))) AddTSStructures(itr1);
-                    //do NOT add the scleroStructures to the addedStructures vector as these will be handled manually!
-                    if (scleroTrial)
+                    if (itr.Item1.ToLower().Contains("lungs"))
                     {
-                        if (selectedSS.CanAddStructure("CONTROL", "Lung_Block_L")) selectedSS.AddStructure("CONTROL", "Lung_Block_L");
-                        if (selectedSS.CanAddStructure("CONTROL", "Lung_Block_R")) selectedSS.AddStructure("CONTROL", "Lung_Block_R");
-                        if (selectedSS.CanAddStructure("CONTROL", "Lungs_Eval")) selectedSS.AddStructure("CONTROL", "Lungs_Eval");
+                        if (itr.Item2 == "Mean Dose < Rx Dose") foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("lungs"))) AddTSStructures(itr1);
+                        //do NOT add the scleroStructures to the addedStructures vector as these will be handled manually!
+                        if (scleroTrial)
+                        {
+                            if (selectedSS.CanAddStructure("CONTROL", "Lung_Block_L")) selectedSS.AddStructure("CONTROL", "Lung_Block_L");
+                            if (selectedSS.CanAddStructure("CONTROL", "Lung_Block_R")) selectedSS.AddStructure("CONTROL", "Lung_Block_R");
+                            if (selectedSS.CanAddStructure("CONTROL", "Lungs_Eval")) selectedSS.AddStructure("CONTROL", "Lungs_Eval");
+                        }
                     }
-                }
-                else if (itr.Item1.ToLower().Contains("liver")) foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("liver"))) AddTSStructures(itr1);
-                else if (itr.Item1.ToLower().Contains("brain")) foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("brain"))) AddTSStructures(itr1);
-                else if (itr.Item1.ToLower().Contains("kidneys"))
-                {
-                    foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("kidneys"))) AddTSStructures(itr1);
-                    //do NOT add the scleroStructures to the addedStructures vector as these will be handled manually!
-                    if (scleroTrial)
+                    else if (itr.Item1.ToLower().Contains("liver")) foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("liver"))) AddTSStructures(itr1);
+                    else if (itr.Item1.ToLower().Contains("brain")) foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("brain"))) AddTSStructures(itr1);
+                    else if (itr.Item1.ToLower().Contains("kidneys"))
                     {
-                        if (selectedSS.CanAddStructure("CONTROL", "Kidney_Block_R")) selectedSS.AddStructure("CONTROL", "Kidney_Block_R");
-                        if (selectedSS.CanAddStructure("CONTROL", "Kidney_Block_L")) selectedSS.AddStructure("CONTROL", "Kidney_Block_L");
+                        foreach (Tuple<string, string> itr1 in TS_structures.Where(x => x.Item2.ToLower().Contains("kidneys"))) AddTSStructures(itr1);
+                        //do NOT add the scleroStructures to the addedStructures vector as these will be handled manually!
+                        if (scleroTrial)
+                        {
+                            if (selectedSS.CanAddStructure("CONTROL", "Kidney_Block_R")) selectedSS.AddStructure("CONTROL", "Kidney_Block_R");
+                            if (selectedSS.CanAddStructure("CONTROL", "Kidney_Block_L")) selectedSS.AddStructure("CONTROL", "Kidney_Block_L");
+                        }
                     }
                 }
             }
