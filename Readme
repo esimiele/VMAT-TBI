@@ -27,7 +27,8 @@ stand-alone executable:
 -If you want to use/not use jaw tracking or the normal tissue objective (NTO) in the optimization, modify the values for the plan.OptimizationSetup.UseJawTracking and 
 plan.OptimizationSetup.AddAutomaticNormalTissueObjective variables near the bottom of the preliminaryChecks method in the optimizationLoop class
 
-Currently working on updating the install instructions.
+Please see the VMAT_TBI_install_and_run_guide.pdf file to help you get up and running quickly. Note, we are currently working on including example VMAT TBI patient CT 
+scans and structure sets (anonymized) in the code distribution.
 Stay tuned.
 
 If you have questions, leave a comment and i'll try and respond as quickly as I can.
