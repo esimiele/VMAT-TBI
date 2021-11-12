@@ -1,0 +1,29 @@
+updated on 11-12-2021
+
+Latest code versions:
+Plug-in --> v1.6_beta
+Executable --> v1.1_beta
+
+Updates to both scripts from v1.5/v1.0 (i.e., pre- 11/12/2021):
+-Fixed minor bugs and GUI formatting issues in both codes
+-Added code to allow the user to specify default settings in both scripts in a .ini configuration file (see the VMAT_TBI_config.ini example provided with the code)
+-Provided additional options in the configuration file that the user can adjust
+-Please see Section 7 of the 'VMAT_TBI_guide.pdf' file for more details on how to setup and use the configuration file
+
+ESAPI/Projects/VMATTBIautoPlan --> binary plug in
+ESAPI_MT/VMATTBI_optLoopMT --> stand-alone executable
+
+Some important notes to make the scripts run:
+binary plug-in:
+-for the most part, this script is pretty self-contained
+-the main parameters that can be adjusted are the global variables noted at the beginning of the UI class (UI.xaml.cs file)
+-if you want to adjust the default energy for the static AP/PA beams, you need to adjust the beam energy specifier used in assigning ebmpStatic 
+(two total instances of "6X" in the constructors for the class)
+
+stand-alone executable:
+-
+
+Please see the VMAT_TBI_install_and_run_guide.pdf file to help you get up and running quickly. Feel free to download the example (anonymized) patient data on the master branch for some examples of running the code on real
+patient data.
+
+If you have questions, leave a comment and i'll try and respond as quickly as I can.

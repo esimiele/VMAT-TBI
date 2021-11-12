@@ -1,0 +1,70 @@
+﻿<Window x:Class="VMATTBI_optLoop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VMATTBI_optLoop"
+        mc:Ignorable="d"
+        Height="740" Width="615" Background="DarkGray"
+        Closing="Window_Closing">
+    <Grid>
+        <Grid Height="235" Width="600" VerticalAlignment="Top" Margin="0,-1,-8,0">
+            <Label Content="VMAT TBI optimization loop script" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="5"></Label>
+            <Button x:Name="help" Height="20" Width="75" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Help" Margin="0,12,53,0" Click="Help_Click"></Button>
+            <Button x:Name="quickStart" Height="20" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Quick Start" Margin="53,12,0,0" Click="QuickStart_Click"></Button>
+
+            <Label Content="Patient MRN:" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,430,157"></Label>
+            <TextBox x:Name="MRN" Height="22" Width="80" TextAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,350,158"></TextBox>
+            <Button x:Name="openPatient" Content="Open Patient" Width="80" Height="22" Margin="0,0,350,127" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="OpenPatient_Click"></Button>
+
+            <Label Content="Dose per fraction (cGy/fraction):" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,128,157"></Label>
+            <Label Content="Number of fractions:" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,128,127"/>
+            <Label Content="Rx dose (cGy):" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,128,97"></Label>
+            <TextBox x:Name="dosePerFx" TextAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="20" Margin="0,0,53,158" IsReadOnly="True"></TextBox>
+            <TextBox x:Name="numFx" TextAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="20" Margin="0,0,53,128" IsReadOnly="True"></TextBox>
+            <TextBox x:Name="Rx" TextAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="20" Margin="0,0,53,98" IsReadOnly="True"></TextBox>
+
+            <Label Content="Run coverage check:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,430,97"></Label>
+            <CheckBox x:Name="runCoverageCk" HorizontalAlignment="Right" Margin="0,0,415,101" VerticalAlignment="Bottom"/>
+
+            <Label Content="Max number optimizations:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,430,65"></Label>
+            <TextBox x:Name="numOptLoops" Height="22" Width="80" TextAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,350,65"></TextBox>
+
+            <Label Content="Run additional optimization to lower hotspots:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,68,65"></Label>
+            <CheckBox x:Name="runAdditionalOpt" HorizontalAlignment="Right" Margin="0,0,53,69" VerticalAlignment="Bottom"/>
+
+            <Label Content="Copy and save each optimized plan:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,230,35"></Label>
+            <CheckBox x:Name="copyAndSave" HorizontalAlignment="Right" Margin="0,0,215,39" VerticalAlignment="Bottom"/>
+
+            <Label Content="PTV V100% (in %):" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,320,0"></Label>
+            <TextBox x:Name="targetNormTB" Height="22" Width="60" TextAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,255,0"></TextBox>
+            <Button x:Name="targetNormInfo" Content="?" Height="22" Width="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,213,215,0" Click="targetNormInfo_Click"></Button>
+        </Grid>
+
+        <TabControl Background="DarkGray" HorizontalAlignment="Left" Height="480" Margin="0,0,0,0" VerticalAlignment="Bottom" Width="607">
+            <TabItem Header="Run parameters">
+                <StackPanel Name="OPT" Width="600" Height="444" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0">
+                    <Label Content="Optimization Parameters" FontSize="20" FontStyle="Normal" HorizontalAlignment="Center" VerticalAlignment="Top"></Label>
+                    <Grid Height="25" Width ="520" HorizontalAlignment="Center" Margin="0,5,0,0">
+                        <Button Content="Add Constraint" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Click="add_constraint_Click"/>
+                        <Button Content="Get Constraints From Plan" Width="150" HorizontalAlignment="Center" VerticalAlignment="Top" Click="getOptFromPlan_Click"/>
+                        <Button Content="Clear List" Width="100" HorizontalAlignment="Right" VerticalAlignment="Top" Click="clear_optParams_Click"/>
+                    </Grid>
+                    <ScrollViewer x:Name="optParamScroller" Height="330" Width="570" Margin="0,10,5,0" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                        <StackPanel Name="opt_parameters" Margin="5"></StackPanel>
+                    </ScrollViewer>
+                    <Button Content="Confirm Constraints and Begin Optimization" FontWeight="Bold" Width="260" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10,0,0" Click="startOpt_Click"></Button>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Script Configuration" Margin="378,-2,-382,-2">
+                <StackPanel Name="configuration" Width="600" Height="444" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0">
+                    <Label Content="Current Script Configuration Parameters" FontSize="20" FontStyle="Normal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0"></Label>
+                    <ScrollViewer x:Name ="configScroller" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="590" Height="370" Margin="0,5,8,0" BorderBrush="Black">
+                        <TextBlock x:Name="configTB" FontSize="12" FontFamily="Courier New" Width="575" Background="White" TextWrapping="Wrap"></TextBlock>
+                    </ScrollViewer>
+                    <Button x:Name="loadNewConfigFile" Content="Load new configuration file" Width="160" HorizontalAlignment="Center" Margin="0,8,0,0" Click="loadNewConfigFile_Click"></Button>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
