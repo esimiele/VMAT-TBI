@@ -1,6 +1,9 @@
-updated on 8-12-2021
+updated on 11-12-2021
 
-Latest code versions:
+NEW:
+Added example patient scans and structures sets for testing. One VMAT-only case and one VMAT with AP/PA case are provided.
+
+Latest release code versions:
 Plug-in --> v1.5
 Executable --> v1.0
 
