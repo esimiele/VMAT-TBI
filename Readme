@@ -2,7 +2,7 @@ updated on 11-12-2021
 
 NEW:
 Added example patient scans and structures sets for testing. One VMAT-only case and one VMAT with AP/PA case are provided.
-Download the patient datasets and import them into Eclipse (preferably into a test box). You won't be able to import the plan object (and consequently the dose object).
+Download the patient datasets and import them into Eclipse (preferably into a test box).
 
 Beta versions of the code are available on the winter2021_beta brach (includes a few new features and bug fixes). Haven't had time to rigorously test the beta code yet.
 
