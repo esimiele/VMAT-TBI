@@ -388,7 +388,7 @@ namespace VMATTBIautoPlan {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/VMATTBIautoPlan_v4.esapi;component/ui.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/VMATTBIautoPlan_v1.7.esapi;component/ui.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\UI.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

@@ -39,8 +39,6 @@ namespace VMATTBI_optLoop
         optimizationLoop op;
         //string to hold the patient MRN number
         string id = "";
-        //MLC model number used as an argument to the optimizeVMAT method
-        string MLCmodel = "";
         //path to where the log files should be written
         string logPath = "";
 
@@ -73,9 +71,6 @@ namespace VMATTBI_optLoop
 
             //copy log path
             logPath = slave.data.logFilePath;
-
-            //MLC model
-            MLCmodel = slave.data.MLCmodel;
 
             optPlanObjHeader = " Plan objectives:" + System.Environment.NewLine;
             optPlanObjHeader += " --------------------------------------------------------------------------" + System.Environment.NewLine;
@@ -303,7 +298,7 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //optimize with intermediate dose (AAA algorithm).
-                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, MLCmodel));
+                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, ""));
                         d.app.SaveModifications();
                     }
 
@@ -336,7 +331,7 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //continue optimization using existing dose as intermediate (AAA algorithm).
-                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, MLCmodel));
+                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, ""));
                         d.app.SaveModifications();
                     }
 
@@ -479,7 +474,7 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //run optimization using current dose as intermediate dose. This will start the optimization at MR3 or MR4 (depending on the configuration of Eclipse)
-                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, MLCmodel));
+                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, ""));
                         d.app.SaveModifications();
                     }
 
@@ -592,7 +587,7 @@ namespace VMATTBI_optLoop
             Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), message); }));
 
             //run one optimization with NO intermediate dose.
-            plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, MLCmodel));
+            plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, ""));
             if (abortOpt) return false;
             //provide update
             Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), " Optimization finished on coverage check! Calculating dose!"); }));

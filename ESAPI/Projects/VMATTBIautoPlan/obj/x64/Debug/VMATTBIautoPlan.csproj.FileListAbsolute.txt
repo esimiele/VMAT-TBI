@@ -1,0 +1,16 @@
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\plugins\VMATTBIautoPlan_v1.7.esapi.dll
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\plugins\VMATTBIautoPlan_v1.7.esapi.pdb
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.AssemblyReference.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.g.cs
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi_MarkupCompile.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi_MarkupCompile.lref
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.baml
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi.g.resources
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.confirmUI.resources
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.enterMissingInfo.resources
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.selectItem.resources
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.GenerateResource.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CoreCompileInputs.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CopyComplete
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi.dll
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi.pdb

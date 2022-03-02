@@ -18,7 +18,6 @@ namespace VMATTBI_optLoop
         public VMS.TPS.Common.Model.API.Application app;
         public ExternalPlanSetup plan;
         public string id;
-        public string MLCmodel;
         public int numOptimizations;
         public double targetVolCoverage;
         public double relativeDose;
@@ -35,7 +34,7 @@ namespace VMATTBI_optLoop
         public string logFilePath;
         //simple method to automatically assign/initialize the above data members
         public void construct(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, List<Tuple<string,string,double,double,DoseValuePresentation>> objectives, List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> RTS,
-                              double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, string mlc, double thres, double lowDose, bool demo, string logPath, VMS.TPS.Common.Model.API.Application a)
+                              double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, double thres, double lowDose, bool demo, string logPath, VMS.TPS.Common.Model.API.Application a)
         {
             optParams = new List<Tuple<string, string, double, double, int>> { };
             optParams = param;
@@ -50,8 +49,6 @@ namespace VMATTBI_optLoop
             isDemo = demo;
             //what percentage of the target volume should recieve the prescription dose
             targetVolCoverage = targetNorm;
-            //MLC model
-            MLCmodel = mlc;
             //dose relative to the prescription dose expressed as a percent (used for normalization)
             relativeDose = 100.0;
             //threshold to determine if the dose or the priority should be adjusted for an optimization constraint. This threshold indicates the relative cost, above which, the dose will be decreased for an optimization constraint.
@@ -127,11 +124,11 @@ namespace VMATTBI_optLoop
         }
 
         public optimizationLoop(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, List<Tuple<string, string, double, double, DoseValuePresentation>> objectives, List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> RTS,
-                                double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, string MLC, double thres, double lowDose, bool demo, string log, VMS.TPS.Common.Model.API.Application a)
+                                double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, double thres, double lowDose, bool demo, string log, VMS.TPS.Common.Model.API.Application a)
         {
             //create a new instance of the structure dataContainer and assign the optimization loop parameters entered by the user to the various data members
             dataContainer d = new dataContainer();
-            d.construct(p, param, objectives, RTS, targetNorm, numOpt, coverMe, unoMas, copyAndSave, flash, MLC, thres, lowDose, demo, log, a);
+            d.construct(p, param, objectives, RTS, targetNorm, numOpt, coverMe, unoMas, copyAndSave, flash, thres, lowDose, demo, log, a);
 
             //create a new thread and pass it the data structure created above (it will copy this information to its local thread memory)
             ESAPIworker slave = new ESAPIworker(d);

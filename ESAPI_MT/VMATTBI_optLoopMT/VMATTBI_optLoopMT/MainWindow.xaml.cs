@@ -45,8 +45,6 @@ namespace VMATTBI_optLoop
         string defautlNumOpt = "3";
         //default plan normalization (i.e., PTV100% = 90%) 
         string defaultPlanNorm = "90";
-        //MLC model
-        string MLCmodel = "1763";
         //run coverage check
         bool runCoverageCheckOption = false;
         //run additional optimization option
@@ -147,7 +145,6 @@ namespace VMATTBI_optLoop
             configTB.Text += String.Format("Run additional optimization: {0}", runAdditionalOptOption) + System.Environment.NewLine;
             configTB.Text += String.Format("Copy and save each optimized plan: {0}", copyAndSaveOption) + System.Environment.NewLine;
             configTB.Text += String.Format("Plan normalization: {0}% (i.e., PTV V100% = {0}%)", defaultPlanNorm) + System.Environment.NewLine;
-            configTB.Text += String.Format("MLC model: {0}", MLCmodel) + System.Environment.NewLine;
             configTB.Text += String.Format("Decision threshold: {0}", threshold) + System.Environment.NewLine;
             configTB.Text += String.Format("Relative lower dose limit: {0}", lowDoseLimit) + System.Environment.NewLine + System.Environment.NewLine;
             
@@ -396,7 +393,7 @@ namespace VMATTBI_optLoop
 
             //start the optimization loop (all saving to the database is performed in the progressWindow class)
             pi.BeginModifications();
-            optimizationLoop optLoop = new optimizationLoop(plan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, MLCmodel, threshold, lowDoseLimit, demo, logFilePath, app);
+            optimizationLoop optLoop = new optimizationLoop(plan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, threshold, lowDoseLimit, demo, logFilePath, app);
         }
 
         private void ConstructPlanObjectives()
@@ -635,7 +632,6 @@ namespace VMATTBI_optLoop
                                             {
                                                 if (parameter == "default number of optimizations") defautlNumOpt = value;
                                                 else if (parameter == "default plan normalization") defaultPlanNorm = value;
-                                                else if (parameter == "MLC model") MLCmodel = value;
                                                 else if (parameter == "decision threshold") threshold = result;
                                                 else if (parameter == "relative lower dose limit") lowDoseLimit = result;
                                             }

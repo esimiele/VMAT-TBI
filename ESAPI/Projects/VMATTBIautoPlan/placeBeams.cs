@@ -167,7 +167,7 @@ namespace VMATTBIautoPlan
             if (useGPU == "Yes" && !calculationModel.Contains("AAA")) plan.SetCalculationOption(calculationModel, "UseGPU", useGPU); 
             
             //set MR restart level option for the photon optimization
-            plan.SetCalculationOption(optimizationModel, "MRLevelAtRestart", MRrestart);
+            plan.SetCalculationOption(optimizationModel, "VMAT/MRLevelAtRestart", MRrestart);
 
             //reference point can only be added for a plan that IS CURRENTLY OPEN
             //plan.AddReferencePoint(selectedSS.Structures.First(x => x.Id == "TS_PTV_VMAT"), null, "VMAT TBI", "VMAT TBI");
