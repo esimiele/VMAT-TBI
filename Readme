@@ -3,7 +3,7 @@ updated on 3-2-2021
 **spring 2022 update
 Fixed the MLC model ID issue reported last week. You no longer need to specify the MLC model ID in the configuration file for the executable to run. Fixed an issue with MR-level restart specification in the plug-in script.
 
-My clinic has v16.1 of Eclipse whereas the scripts were built in v15.6. This may cause a bit of a mismatch between the code and what Eclipse requires. Both scripts will run in v16.1
+My current clinic has v16.1 of Eclipse whereas the scripts were built in v15.6 (during my residency). This may cause a bit of a mismatch between the code and what Eclipse requires. Both scripts will run in v16.1
 as they were recompiled with the necessary libraries to run in v16.1. The VMS.TPS libraries have been updated to v16.1. Minimal changes were required for the plug-in script.
 However, the executable binary is now compiled and placed in /ESAPI_MT/VMATTBI_optLoopMT/VMATTBI_optLoopMT/bin/x64/debug instead of /ESAPI_MT/VMATTBI_optLoopMT/VMATTBI_optLoopMT/bin/debug
 You need to modify the .ini configuration file inside the /bin/x64/debug directory for any changes to take effect if your clinic is using v16. 
