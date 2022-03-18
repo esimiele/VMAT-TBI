@@ -148,6 +148,7 @@ namespace VMATTBI_optLoop
             //execute the optimization loop on the daughter thread
             slave.DoWork(d =>
             {
+                // TODO: I think this is where I have to add the query and results for feature requested in esimiele/VMAT-TBI#5
                 int percentCompletion = 0;
                 //this dispatcher is for the daughter thread and tells the code to execute the below thread on the dauther thread asynchronously.
                 //These commands in this class are used to update the progress window UI (under control of the daughter thread)

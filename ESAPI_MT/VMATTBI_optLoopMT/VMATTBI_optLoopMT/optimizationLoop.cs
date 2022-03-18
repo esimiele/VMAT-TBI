@@ -227,6 +227,7 @@ namespace VMATTBI_optLoop
             if(spinningManny == null) spinningManny = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == "couchmannysurfac");
 
             //check to see if the couch and rail structures are present in the structure set. If not, let the user know as an FYI. At this point, the user can choose to stop the optimization loop and add the couch structures
+            // TODO: ExactIGRT has no rails. 
             if (!couch.Any() || !rails.Any())
             {
                 confirmUI CUI = new VMATTBI_optLoop.confirmUI();
@@ -239,6 +240,7 @@ namespace VMATTBI_optLoop
             if (matchline != null && !matchline.IsEmpty)
             {
                 //if a matchline contour is present and filled, does the spinning manny couch exist in the structure set? If not, let the user know so they can decide if they want to continue of stop the optimization loop
+                // TODO: Radio button for centers using other systems then spinningManny
                 if (spinningManny == null || spinningManny.IsEmpty)
                 {
                     confirmUI CUI = new VMATTBI_optLoop.confirmUI();
@@ -340,6 +342,7 @@ namespace VMATTBI_optLoop
             }
 
             //turn on jaw tracking
+            // TODO: This needs to be a Radio Button
             plan.OptimizationSetup.UseJawTracking = true;
             //set auto NTO priority to zero (i.e., shut it off)
             plan.OptimizationSetup.AddAutomaticNormalTissueObjective(0.0);
