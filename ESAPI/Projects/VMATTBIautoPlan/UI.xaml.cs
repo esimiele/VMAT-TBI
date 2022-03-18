@@ -139,6 +139,9 @@ namespace VMATTBIautoPlan
         Structure flashStructure = null;
         planPrep prep = null;
 
+        // TODO: add option to change grid-size
+
+
         public UI(ScriptContext c, string configurationFile)
         {
             InitializeComponent();
