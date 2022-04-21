@@ -108,7 +108,7 @@ namespace VMATTBI_optLoop {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/VMATTBI_optLoopMT_v1.2;component/progresswindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/VMATTBI_optLoopMT_v1.3;component/progresswindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\progressWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

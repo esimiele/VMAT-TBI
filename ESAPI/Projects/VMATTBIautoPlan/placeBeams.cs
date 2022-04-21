@@ -38,14 +38,15 @@ namespace VMATTBIautoPlan
         List<VRect<double>> jawPos;
         private string calculationModel = "";
         private string optimizationModel = "";
-        private string useGPU = "";
+        private string useGPUdose = "";
+        private string useGPUoptimization = "";
         private string MRrestart = "";
         private bool useFlash;
         private bool contourOverlap = false;
         private double contourOverlapMargin;
         public List<Structure> jnxs = new List<Structure> { };
 
-        public placeBeams(StructureSet ss, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpu, string mr, bool flash)
+        public placeBeams(StructureSet ss, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash)
         {
             selectedSS = ss;
             pi = selectedSS.Patient;
@@ -63,12 +64,13 @@ namespace VMATTBIautoPlan
             //copy the calculation model
             calculationModel = calcModel;
             optimizationModel = optModel;
-            useGPU = gpu;
+            useGPUdose = gpuDose;
+            useGPUoptimization = gpuOpt;
             MRrestart = mr;
             useFlash = flash;
         }
 
-        public placeBeams(StructureSet ss, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpu, string mr, bool flash, double overlapMargin)
+        public placeBeams(StructureSet ss, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash, double overlapMargin)
         {
             selectedSS = ss;
             pi = selectedSS.Patient;
@@ -86,7 +88,8 @@ namespace VMATTBIautoPlan
             //copy the calculation model
             calculationModel = calcModel;
             optimizationModel = optModel;
-            useGPU = gpu;
+            useGPUdose = gpuDose;
+            useGPUoptimization = gpuOpt;
             MRrestart = mr;
             useFlash = flash;
             //user wants to contour the overlap between fields in adjacent VMAT isocenters
@@ -147,7 +150,7 @@ namespace VMATTBIautoPlan
                 calculationModel = SUI.itemCombo.SelectedItem.ToString();
 
                 //just an FYI that the calculation will likely run out of memory and crash the optimization when Acuros is used
-                if(calculationModel.ToLower().Contains("acuros"))
+                if(calculationModel.ToLower().Contains("acuros") || calculationModel.ToLower().Contains("axb"))
                 {
                     confirmUI CUI = new VMATTBIautoPlan.confirmUI();
                     CUI.message.Text = "Warning!" + Environment.NewLine + "The optimization will likely crash (i.e., run out of memory) if Acuros is used!" + Environment.NewLine + "Continue?!";
@@ -158,16 +161,21 @@ namespace VMATTBIautoPlan
             plan.SetCalculationModel(CalculationType.PhotonVolumeDose, calculationModel);
             plan.SetCalculationModel(CalculationType.PhotonVMATOptimization, optimizationModel);
 
-            //Dictionary<string, string> d = plan.GetCalculationOptions(plan.GetCalculationModel(CalculationType.PhotonVolumeDose));
+            //Dictionary<string, string> d = plan.GetCalculationOptions(plan.GetCalculationModel(CalculationType.PhotonVMATOptimization));
             //string m = "";
             //foreach (KeyValuePair<string, string> t in d) m += String.Format("{0}, {1}", t.Key, t.Value) + System.Environment.NewLine;
             //MessageBox.Show(m);
 
             //set the GPU dose calculation option (only valid for acuros)
-            if (useGPU == "Yes" && !calculationModel.Contains("AAA")) plan.SetCalculationOption(calculationModel, "UseGPU", useGPU); 
-            
+            if (useGPUdose == "Yes" && !calculationModel.Contains("AAA")) plan.SetCalculationOption(calculationModel, "UseGPU", useGPUdose);
+            else plan.SetCalculationOption(calculationModel, "UseGPU", "No");
+
             //set MR restart level option for the photon optimization
             plan.SetCalculationOption(optimizationModel, "VMAT/MRLevelAtRestart", MRrestart);
+
+            //set the GPU optimization option
+            if (useGPUoptimization == "Yes") plan.SetCalculationOption(optimizationModel, "General/OptimizerSettings/UseGPU", useGPUoptimization);
+            else plan.SetCalculationOption(optimizationModel, "General/OptimizerSettings/UseGPU", "No");
 
             //reference point can only be added for a plan that IS CURRENTLY OPEN
             //plan.AddReferencePoint(selectedSS.Structures.First(x => x.Id == "TS_PTV_VMAT"), null, "VMAT TBI", "VMAT TBI");
@@ -208,6 +216,7 @@ namespace VMATTBIautoPlan
                 {
                     var CUI = new VMATTBIautoPlan.confirmUI();
                     CUI.message.Text = "Calculated isocenter separation > 38.0 cm, which reduces the overlap between adjacent fields!" + Environment.NewLine + Environment.NewLine + "Truncate isocenter separation to 38.0 cm?!";
+                    CUI.button1.Text = "No";
                     CUI.ShowDialog();
                     if (CUI.confirm)
                     {

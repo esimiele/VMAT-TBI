@@ -114,9 +114,9 @@ namespace VMATTBIautoPlan
                 //matchline structure is present and not empty
                 else
                 {
-                    //get number of isos for PTV superior to matchplane (always truncate this value to a maximum of 3 isocenters)
+                    //get number of isos for PTV superior to matchplane (always truncate this value to a maximum of 4 isocenters)
                     numVMATIsos = (int)Math.Ceiling(((pts.Max(p => p.Z) - selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z) / (400.0 - 20.0)));
-                    if (numVMATIsos > 3) numVMATIsos = 3;
+                    if (numVMATIsos > 4) numVMATIsos = 4;
 
                     //get number of iso for PTV inferior to matchplane
                     //if (selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z - pts.Min(p => p.Z) - 3.0 <= (400.0 - 20.0)) numIsos = numVMATIsos + 1;
@@ -129,22 +129,7 @@ namespace VMATTBIautoPlan
             }
 
             //set isocenter names based on numIsos and numVMATIsos (determined these names from prior cases). Need to implement a more clever way to name the isocenters
-            isoNames.Add("Head");
-            if (numVMATIsos == 2) isoNames.Add("Pelvis");
-            else if (numVMATIsos == 3 && numIsos > numVMATIsos)
-            {
-                isoNames.Add("Chest"); isoNames.Add("Pelvis");
-            }
-            //this could technically be an else statement, but I left it as an else-if statement so it's explicit what situation is being considered here
-            else if (numVMATIsos == 3 && numIsos == numVMATIsos)
-            {
-                isoNames.Add("Pelvis"); isoNames.Add("Legs");
-            }
-            if (numIsos > numVMATIsos)
-            {
-                isoNames.Add("AP / PA upper legs");
-                if (numIsos == numVMATIsos + 2) isoNames.Add("AP / PA lower legs");
-            }
+            isoNames = new List<string>(new isoNameHelper().getIsoNames(numVMATIsos, numIsos));
 
             //check if selected structures are empty or of high-resolution (i.e., no operations can be performed on high-resolution structures)
             string output = "The following structures are high-resolution:" + System.Environment.NewLine;
@@ -552,6 +537,11 @@ namespace VMATTBIautoPlan
             {
                 Structure tmp = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == itr.Item2.ToLower());
 
+                //4-15-2022 
+                //if the human_body structure exists and is not null, it is likely this script has been run previously. As a precaution, copy the human_body structure onto the body (in case flash was requested
+                //in the previous run of the script)
+                if (itr.Item2.ToLower() == "human_body" && tmp != null) selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "body").SegmentVolume = tmp.Margin(0.0);
+
                 //structure is present in selected structure set
                 if (tmp != null)
                 {
@@ -594,6 +584,12 @@ namespace VMATTBIautoPlan
                     }
                 }
             }
+
+            //4-15-2022 
+            //remove ALL tuning structures from any previous runs (structure id starts with 'TS_'). Be sure to exclude any requested TS structures from the config file as we just added them!
+            List<Structure> tsStructs = selectedSS.Structures.Where(x => x.Id.ToLower().Substring(0, 3) == "ts_").ToList();
+            foreach (Structure itr in tsStructs) if (!structures.Where(x => x.Item2.ToLower() == itr.Id.ToLower()).Any() && selectedSS.CanRemoveStructure(itr)) selectedSS.RemoveStructure(itr);
+
             return false;
         }
 

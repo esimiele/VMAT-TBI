@@ -1,16 +1,75 @@
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\plugins\VMATTBIautoPlan_v1.7.esapi.dll
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\plugins\VMATTBIautoPlan_v1.7.esapi.pdb
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.AssemblyReference.cache
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.g.cs
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi_MarkupCompile.cache
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi_MarkupCompile.lref
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.baml
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi.g.resources
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.confirmUI.resources
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.enterMissingInfo.resources
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.selectItem.resources
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.GenerateResource.cache
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CoreCompileInputs.cache
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CopyComplete
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi.dll
-C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.7.esapi.pdb
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.g.cs
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.baml
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CoreCompileInputs.cache
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.confirmUI.resources
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.GenerateResource.cache
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csprojAssemblyReference.cache
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.g.cs
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.baml
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.confirmUI.resources
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.GenerateResource.cache
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CoreCompileInputs.cache
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.selectItem.resources
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.selectItem.resources
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.enterMissingInfo.resources
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csprojAssemblyReference.cache
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.enterMissingInfo.resources
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_3.esapi.dll
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_3.esapi.pdb
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csprojAssemblyReference.cache
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.g.cs
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_3.esapi_MarkupCompile.cache
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_3.esapi_MarkupCompile.lref
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.baml
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_3.esapi.g.resources
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.confirmUI.resources
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.enterMissingInfo.resources
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.selectItem.resources
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.GenerateResource.cache
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CoreCompileInputs.cache
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_3.esapi.dll
+Y:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_3.esapi.pdb
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.42.esapi.dll
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.42.esapi.pdb
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.42.esapi_MarkupCompile.cache
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.42.esapi_MarkupCompile.lref
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.42.esapi.g.resources
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.42.esapi.dll
+Z:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.42.esapi.pdb
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.5.esapi.dll
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.5.esapi.pdb
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.5.esapi_MarkupCompile.cache
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.5.esapi_MarkupCompile.lref
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.5.esapi.g.resources
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.5.esapi.dll
+T:\Users\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.5.esapi.pdb
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csprojAssemblyReference.cache
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.g.cs
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.baml
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.confirmUI.resources
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.enterMissingInfo.resources
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.selectItem.resources
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.GenerateResource.cache
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CoreCompileInputs.cache
+H:\Stanford\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.esapi.dll
+H:\Stanford\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.esapi.pdb
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.esapi_MarkupCompile.cache
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.esapi_MarkupCompile.lref
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.esapi.g.resources
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.esapi.dll
+H:\Stanford\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.esapi.pdb
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.g.cs
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\UI.baml
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.confirmUI.resources
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.enterMissingInfo.resources
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.selectItem.resources
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.GenerateResource.cache
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.CoreCompileInputs.cache
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan.csproj.AssemblyReference.cache
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.8.esapi.dll
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\plugins\VMATTBIautoPlan_v1.8.esapi.pdb
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.8.esapi_MarkupCompile.cache
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.8.esapi_MarkupCompile.lref
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.8.esapi.g.resources
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.8.esapi.dll
+Z:\ESimiele\Research\VMAT_TBI\ESAPI\Projects\VMATTBIautoPlan\obj\x64\Debug\VMATTBIautoPlan_v1.8.esapi.pdb

@@ -77,7 +77,7 @@ namespace VMATTBI_optLoop
             optPlanObjHeader += String.Format(" {0, -15} | {1, -16} | {2, -10} | {3, -10} | {4, -9} |", "structure Id", "constraint type", "dose", "volume (%)", "dose type") + System.Environment.NewLine;
             optPlanObjHeader += " --------------------------------------------------------------------------" + System.Environment.NewLine;
 
-            optRequestTS += String.Format("Requested tuning structures:") + System.Environment.NewLine;
+            optRequestTS += String.Format(" Requested tuning structures:") + System.Environment.NewLine;
             optRequestTS += " --------------------------------------------------------------------------" + System.Environment.NewLine;
             optRequestTS += String.Format(" {0, -15} | {1, -9} | {2, -10} | {3, -5} | {4, -8} | {5, -10} |", "structure Id", "low D (%)", "high D (%)", "V (%)", "priority", "constraint") + System.Environment.NewLine;
             optRequestTS += " --------------------------------------------------------------------------" + System.Environment.NewLine;
@@ -298,8 +298,13 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //optimize with intermediate dose (AAA algorithm).
-                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, ""));
-                        d.app.SaveModifications();
+                        try
+                        {
+                            OptimizerResult optRes = d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, ""));
+                            if (!optRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed!" + System.Environment.NewLine + " Try running the optimization manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+                            d.app.SaveModifications();
+                        }
+                        catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
                     }
 
                     //check if user wants to stop
@@ -315,8 +320,13 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //calculate dose
-                        d.plan.CalculateDose();
-                        d.app.SaveModifications();
+                        try
+                        {
+                            CalculationResult calcRes = d.plan.CalculateDose();
+                            if (!calcRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed!" + System.Environment.NewLine + " Try running the dose calculation manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+                            d.app.SaveModifications();
+                        }
+                        catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
                     }
 
                     if (abortOpt)
@@ -331,8 +341,13 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //continue optimization using existing dose as intermediate (AAA algorithm).
-                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, ""));
-                        d.app.SaveModifications();
+                        try 
+                        { 
+                            OptimizerResult optRes = d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, ""));
+                            if (!optRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed!" + System.Environment.NewLine + " Try running the optimization manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+                            d.app.SaveModifications();
+                        }
+                        catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
                     }
 
                     //check if user wants to stop
@@ -348,8 +363,13 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //calculate dose
-                        d.plan.CalculateDose();
-                        d.app.SaveModifications();
+                        try
+                        {
+                            CalculationResult calcRes = d.plan.CalculateDose();
+                            if (!calcRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed!" + System.Environment.NewLine + " Try running the dose calculation manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+                            d.app.SaveModifications();
+                        }
+                        catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
                     }
 
                     if (abortOpt)
@@ -474,8 +494,13 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //run optimization using current dose as intermediate dose. This will start the optimization at MR3 or MR4 (depending on the configuration of Eclipse)
-                        d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, ""));
-                        d.app.SaveModifications();
+                        try
+                        {
+                            OptimizerResult optRes = d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationOption.ContinueOptimizationWithPlanDoseAsIntermediateDose, ""));
+                            if (!optRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed!" + System.Environment.NewLine + " Try running the optimization manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+                            d.app.SaveModifications();
+                        }
+                        catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
                     }
 
                     if (abortOpt)
@@ -490,8 +515,13 @@ namespace VMATTBI_optLoop
                     else
                     {
                         //calculate dose
-                        d.plan.CalculateDose();
-                        d.app.SaveModifications();
+                        try
+                        {
+                            CalculationResult calcRes = d.plan.CalculateDose();
+                            if (!calcRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed!" + System.Environment.NewLine + " Try running the dose calculation manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+                            d.app.SaveModifications();
+                        }
+                        catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
                     }
 
                     if (abortOpt)
@@ -550,7 +580,7 @@ namespace VMATTBI_optLoop
                         if (demo) Thread.Sleep(3000);
                         else
                         {
-                            foreach (ExternalPlanSetup p in plansWithCalcDose) p.CalculateDose();
+                            foreach (ExternalPlanSetup p in plansWithCalcDose) { try { p.CalculateDose(); } catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed because: {0}", except.Message)); }));} }
 
                         }
                         Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), " Dose calculated, normalizing plan!"); }));
@@ -587,14 +617,24 @@ namespace VMATTBI_optLoop
             Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), message); }));
 
             //run one optimization with NO intermediate dose.
-            plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, ""));
+            try
+            {
+                OptimizerResult optRes = plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, ""));
+                if (!optRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed!" + System.Environment.NewLine + " Try running the optimization manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+            }
+            catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
             if (abortOpt) return false;
             //provide update
             Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), " Optimization finished on coverage check! Calculating dose!"); }));
             Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Elapsed time: {0}", currentTime)); }));
 
             //calculate dose (using AAA algorithm)
-            plan.CalculateDose();
+            try
+            {
+                CalculationResult calcRes = plan.CalculateDose();
+                if (!calcRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed!" + System.Environment.NewLine + " Try running the dose calculation manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
+            }
+            catch (Exception except) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Dose calculation failed because: {0}" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!", except.Message)); })); abortOpt = true; }
             if (abortOpt) return false;
             Dispatcher.BeginInvoke((Action)(() => { provideUpdate((int)(100 * (++percentCompletion) / calcItems), " Dose calculated for coverage check, normalizing plan!"); }));
 

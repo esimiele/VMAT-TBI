@@ -138,7 +138,7 @@ namespace VMATTBIautoPlan
         List<string> linacs = new List<string> { "LA16", "LA17" };
         List<string> beamEnergies = new List<string> { "6X", "10X" };
         //default number of beams per isocenter from head to toe
-        int[] beamsPerIso = { 4, 3, 2, 2, 2 };
+        int[] beamsPerIso = { 4, 3, 2, 2, 2, 2 };
         //collimator rotations for how to orient the beams (placeBeams class)
         double[] collRot = { 3.0, 357.0, 87.0, 93.0 };
         //jaw positions of the placed VMAT beams
@@ -153,7 +153,9 @@ namespace VMATTBIautoPlan
         string optimizationModel = "PO_15605";
 
         //use GPU for dose calculation (not optimization)
-        string useGPU = "false";
+        string useGPUdose = "false";
+        //use GPU for optimization
+        string useGPUoptimization = "false";
         //what MR level should the optimizer restart at following intermediate dose calculation
         string MRrestartLevel = "MR3";
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,8 +255,9 @@ namespace VMATTBIautoPlan
             configTB.Text += String.Format("(x1,y1,x2,y2)") + System.Environment.NewLine;
             foreach (VRect<double> j in jawPos) configTB.Text += String.Format("({0:0.0},{1:0.0},{2:0.0},{3:0.0})", j.X1 / 10, j.Y1 / 10, j.X2 / 10, j.Y2 / 10) + System.Environment.NewLine;
             configTB.Text += String.Format("Photon dose calculation model: {0}", calculationModel) + System.Environment.NewLine;
-            configTB.Text += String.Format("Use GPU for dose calculation: {0}", useGPU) + System.Environment.NewLine;
+            configTB.Text += String.Format("Use GPU for dose calculation: {0}", useGPUdose) + System.Environment.NewLine;
             configTB.Text += String.Format("Photon optimization model: {0}", optimizationModel) + System.Environment.NewLine;
+            configTB.Text += String.Format("Use GPU for optimization: {0}", useGPUoptimization) + System.Environment.NewLine;
             configTB.Text += String.Format("MR level restart at: {0}", MRrestartLevel) + System.Environment.NewLine + System.Environment.NewLine;
 
             configTB.Text += String.Format("Requested general tuning structures:") + System.Environment.NewLine;
@@ -490,6 +493,7 @@ namespace VMATTBIautoPlan
                 addMargin.HorizontalAlignment = HorizontalAlignment.Left;
                 addMargin.VerticalAlignment = VerticalAlignment.Top;
                 addMargin.TextAlignment = TextAlignment.Center;
+                addMargin.VerticalContentAlignment = VerticalAlignment.Center;
                 addMargin.Margin = new Thickness(5, 5, 0, 0);
                 addMargin.Text = Convert.ToString(defaultList[i].Item3);
                 if (defaultList[i].Item2 != "Mean Dose < Rx Dose") addMargin.Visibility = Visibility.Hidden;
@@ -665,16 +669,16 @@ namespace VMATTBIautoPlan
                         return;
                     }
                 }
-                //simple check to see if there are any structures with the tag 'flash' in the Id. If so, it is possible that this script was already run and flash was created. If so, the user could potentially
-                //add more flash than they intended to the plan. Make them confirm that the body contour is set correctly and flash has NOT been previously added to the patient
-                if (selectedSS.Structures.Where(x => x.Id.ToLower().Contains("flash")).Any())
-                {
-                    confirmUI CUI = new VMATTBIautoPlan.confirmUI();
-                    CUI.message.Text = "Warning!" + Environment.NewLine + "I've found some structures with 'flash' in the Id!" +
-                        Environment.NewLine + "This might mean flash has already been added to this structure set!" + Environment.NewLine + "Continue?!";
-                    CUI.ShowDialog();
-                    if (!CUI.confirm) return;
-                }
+                ////simple check to see if there are any structures with the tag 'flash' in the Id. If so, it is possible that this script was already run and flash was created. If so, the user could potentially
+                ////add more flash than they intended to the plan. Make them confirm that the body contour is set correctly and flash has NOT been previously added to the patient
+                //if (selectedSS.Structures.Where(x => x.Id.ToLower().Contains("flash")).Any())
+                //{
+                //    confirmUI CUI = new VMATTBIautoPlan.confirmUI();
+                //    CUI.message.Text = "Warning!" + Environment.NewLine + "I've found some structures with 'flash' in the Id!" +
+                //        Environment.NewLine + "This might mean flash has already been added to this structure set!" + Environment.NewLine + "Continue?!";
+                //    CUI.ShowDialog();
+                //    if (!CUI.confirm) return;
+                //}
             }
             double targetMargin;
             if (!double.TryParse(targetMarginTB.Text, out targetMargin))
@@ -795,6 +799,8 @@ namespace VMATTBIautoPlan
 
             BEAMS_SP.Children.Clear();
 
+            numVMATisosTB.Text = numVMATIsos.ToString();
+
             StackPanel sp = new StackPanel();
             sp.Height = 30;
             sp.Width = structures_sp.Width;
@@ -807,7 +813,7 @@ namespace VMATTBIautoPlan
             linac.Content = "Linac:";
             linac.HorizontalAlignment = HorizontalAlignment.Right;
             linac.VerticalAlignment = VerticalAlignment.Top;
-            linac.Width = 215;
+            linac.Width = 208;
             linac.FontSize = 14;
             linac.Margin = new Thickness(0, 0, 10, 0);
             sp.Children.Add(linac);
@@ -878,7 +884,7 @@ namespace VMATTBIautoPlan
             //subtract a beam from the first isocenter (head) if the user is NOT interested in sparing the brain
             if (!optParameters.Where(x => x.Item1.ToLower().Contains("brain")).Any()) beamsPerIso[0]--;
             //subtract a beam from the second isocenter (chest/abdomen area) if the user is NOT interested in sparing the kidneys
-            if (!optParameters.Where(x => x.Item1.ToLower().Contains("kidneys")).Any()) beamsPerIso[1]--;
+            //if (!optParameters.Where(x => x.Item1.ToLower().Contains("kidneys")).Any()) beamsPerIso[1]--;
 
             //add iso names and suggested number of beams
             for (int i = 0; i < numIsos; i++)
@@ -888,7 +894,7 @@ namespace VMATTBIautoPlan
                 sp.Width = structures_sp.Width;
                 sp.Orientation = Orientation.Horizontal;
                 sp.HorizontalAlignment = HorizontalAlignment.Center;
-                sp.Margin = new Thickness(5);
+                sp.Margin = new Thickness(2);
 
                 Label iso = new Label();
                 iso.Content = String.Format("Isocenter {0} <{1}>:", (i + 1).ToString(), isoNames.ElementAt(i));
@@ -914,6 +920,25 @@ namespace VMATTBIautoPlan
 
                 BEAMS_SP.Children.Add(sp);
             }
+        }
+
+        private void updateVMATisos_Click(object sender, RoutedEventArgs e)
+        {
+            int tmp;
+            if(!isoNames.Any()) MessageBox.Show("Error! Please generate the tuning structures before updating the requested number of VMAT isocenters!");
+            else if (VMATplan != null) MessageBox.Show("Error! VMAT plan has already been generated! Cannot place beams again!");
+            else if (!int.TryParse(numVMATisosTB.Text, out tmp)) MessageBox.Show("Error! Requested number of VMAT isocenters is NaN! Please try again!");
+            else if (tmp == numVMATIsos) MessageBox.Show("Warning! Requested number of VMAT isocenters = current number of VMAT isocenters!");
+            else if (tmp < 2 || tmp > 4) MessageBox.Show("Error! Requested number of VMAT isocenters is less than 2 or greater than 4! Please try again!");
+            else
+            {
+                if (!optParameters.Where(x => x.Item1.ToLower().Contains("brain")).Any()) beamsPerIso[0]++;
+                numIsos += tmp - numVMATIsos;
+                numVMATIsos = tmp;
+                isoNames = new List<string>(new isoNameHelper().getIsoNames(numVMATIsos, numIsos));
+                populateBeamsTab();
+            }
+            
         }
 
         private void place_beams_Click(object sender, RoutedEventArgs e)
@@ -995,9 +1020,9 @@ namespace VMATTBIautoPlan
                 //convert from mm to cm
                 contourOverlapMargin *= 10.0;
                 //overloaded constructor for the placeBeams class
-                place = new placeBeams(selectedSS, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPU, MRrestartLevel, useFlash, contourOverlapMargin);
+                place = new placeBeams(selectedSS, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash, contourOverlapMargin);
             }
-            else place = new placeBeams(selectedSS, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPU, MRrestartLevel, useFlash);
+            else place = new placeBeams(selectedSS, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash);
 
             VMATplan = place.generate_beams();
             if (VMATplan == null) return;
@@ -1738,7 +1763,7 @@ namespace VMATTBIautoPlan
                                             }
                                             b.Add(int.Parse(line.Substring(0, line.IndexOf("}"))));
                                             //only override the requested number of beams in the beamsPerIso array  
-                                            for (int i = 0; i < b.Count(); i++) { if (i < 5) beamsPerIso[i] = b.ElementAt(i); }
+                                            for (int i = 0; i < b.Count(); i++) { if(i < beamsPerIso.Count()) beamsPerIso[i] = b.ElementAt(i); }
                                         }
                                         else if (parameter == "collimator rotations")
                                         {
@@ -1754,7 +1779,8 @@ namespace VMATTBIautoPlan
                                             c.Add(double.Parse(line.Substring(0, line.IndexOf("}"))));
                                             for (int i = 0; i < c.Count(); i++) { if (i < 5) collRot[i] = c.ElementAt(i); }
                                         }
-                                        else if (parameter == "use GPU for dose calculation") useGPU = value;
+                                        else if (parameter == "use GPU for dose calculation") useGPUdose = value;
+                                        else if (parameter == "use GPU for optimization") useGPUoptimization = value;
                                         else if (parameter == "MR level restart") MRrestartLevel = value;
                                         //other parameters that should be updated
                                         else if (parameter == "use flash by default") useFlashByDefault = bool.Parse(value);
@@ -1928,5 +1954,7 @@ namespace VMATTBIautoPlan
             priorityVal = int.Parse(line.Substring(0, line.IndexOf("}")));
             return Tuple.Create(structure, constraintType, doseVal, volumeVal, priorityVal);
         }
+
+        
     }
 }

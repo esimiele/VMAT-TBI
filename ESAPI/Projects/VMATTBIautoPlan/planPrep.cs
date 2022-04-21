@@ -126,14 +126,19 @@ namespace VMATTBIautoPlan
 
             //logic to assign the isocenter names based on the number of vmat isos and the total number of isos (taken and modified from the generateTS class)
             names.Add("Head");
-            if (numVMATIsos == numIsos)
+            if (numIsos > numVMATIsos)
             {
                 if (numVMATIsos == 2) names.Add("Pelvis");
                 else
                 {
-                    names.Add("Pelvis");
-                    names.Add("Legs");
+                    names.Add("Chest");
+                    if (numVMATIsos == 3) names.Add("Pelvis");
+                    else if (numVMATIsos == 4) { names.Add("Abdomen"); names.Add("Pelvis"); }
                 }
+                names.Add("AP / PA upper legs");
+                if (numIsos - numVMATIsos == 2) names.Add("AP / PA lower legs");
+                //greater than 2 AP/pA isos (it happened once...)
+                else if (numIsos - numVMATIsos > 2) { names.Add("AP / PA Mid legs"); names.Add("AP / PA lower legs"); }
             }
             else
             {
@@ -141,12 +146,9 @@ namespace VMATTBIautoPlan
                 else
                 {
                     names.Add("Chest");
-                    names.Add("Pelvis");
+                    if (numVMATIsos == 3) names.Add("Legs");
+                    else if (numVMATIsos == 4) { names.Add("Pelvis"); names.Add("Legs"); }
                 }
-                names.Add("AP / PA upper legs");
-                if (numIsos - numVMATIsos == 2) names.Add("AP / PA lower legs");
-                //greater than 2 AP/pA isos (it happened once...)
-                else if (numIsos - numVMATIsos > 2) { names.Add("AP / PA Mid legs"); names.Add("AP / PA lower legs"); }
             }
 
             //get the user origin in user coordinates
@@ -288,7 +290,8 @@ namespace VMATTBIautoPlan
                     if (!beams.Where(x => x.Id == b.Id).Any() && !b.IsSetupField) removeMe.Add(b);
                 }
                 //now remove the beams for the current plan copy
-                foreach (Beam b in removeMe) newplan.RemoveBeam(b);
+                try { foreach (Beam b in removeMe) newplan.RemoveBeam(b); }
+                catch (Exception e) { MessageBox.Show(String.Format("Failed to remove beams in plan {0} because:\n{1}",newplan.Id,e.Message)); }
                 count++;
             }
 
