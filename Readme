@@ -1,7 +1,13 @@
-updated on 3-2-2021
+updated 4/21/2022
 
-**spring 2022 update
-Fixed the MLC model ID issue reported last week. You no longer need to specify the MLC model ID in the configuration file for the executable to run. Fixed an issue with MR-level restart specification in the plug-in script.
+Changes from previous push (4/10/2022):
+-added option to specify number of VMAT isocenters in the GUI (up to a maximum of 4).
+-fixed an issue where flash could be added to the body structure multiple times. Now the script can be run on the same structure set multiple times without generating flash multiple times
+-fixed an issue regarding GPU dose calculation option
+-added option for user to elect to use GPU for optimization
+-added error handling code in optimization loop to allow the program to fail gracefully if it encounters a problem during optimization (particularly if the user elects to use the GPU for dose calculation/optimization)
+-fixed minor formatting issues
+-fixed minor issues with the GUI
 
 My current clinic has v16.1 of Eclipse whereas the scripts were built in v15.6 (during my residency). This may cause a bit of a mismatch between the code and what Eclipse requires. Both scripts will run in v16.1
 as they were recompiled with the necessary libraries to run in v16.1. The VMS.TPS libraries have been updated to v16.1. Minimal changes were required for the plug-in script.
@@ -11,14 +17,8 @@ You need to modify the .ini configuration file inside the /bin/x64/debug directo
 I will work to update the scripts using build configurations so it is easy to rebuild the scripts according to the Eclipse version at your clinic.
 
 Latest code versions:
-Plug-in --> v1.7_beta
-Executable --> v1.2_beta
-
-Updates to both scripts from v1.5/v1.0 (i.e., pre- 11/12/2021):
--Fixed minor bugs and GUI formatting issues in both codes
--Added code to allow the user to specify default settings in both scripts in a .ini configuration file (see the VMAT_TBI_config.ini example provided with the code)
--Provided additional options in the configuration file that the user can adjust
--Please see Section 7 of the 'VMAT_TBI_guide.pdf' file for more details on how to setup and use the configuration file
+Plug-in --> v1.8
+Executable --> v1.3
 
 ESAPI/Projects/VMATTBIautoPlan --> binary plug in
 ESAPI_MT/VMATTBI_optLoopMT --> stand-alone executable
