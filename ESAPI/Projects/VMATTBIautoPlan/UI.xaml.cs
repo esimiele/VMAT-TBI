@@ -1269,7 +1269,8 @@ namespace VMATTBIautoPlan
                 else MessageBox.Show("Constraint type not recognized!");
             }
             //turn on jaw tracking
-            VMATplan.OptimizationSetup.UseJawTracking = true;
+            try { VMATplan.OptimizationSetup.UseJawTracking = true; }
+            catch (Exception except) { MessageBox.Show(String.Format("Warning! Could not set jaw tracking to true for VMAT plan because: {0}\nJaw tacking will not be enabled!", except.Message)); }
             //set auto NTO priority to zero (i.e., shut it off). It has to be done this way because every plan created in ESAPI has an instance of an automatic NTO, which CAN'T be deleted.
             VMATplan.OptimizationSetup.AddAutomaticNormalTissueObjective(0.0);
 
