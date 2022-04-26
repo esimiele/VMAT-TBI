@@ -337,7 +337,8 @@ namespace VMATTBI_optLoop
             }
 
             //turn on jaw tracking
-            plan.OptimizationSetup.UseJawTracking = true;
+            try { plan.OptimizationSetup.UseJawTracking = true; }
+            catch (Exception except) { MessageBox.Show(String.Format("Warning! Could not set jaw tracking to true for VMAT plan because: {0}\nJaw tacking will not be enabled!", except.Message)); }
             //set auto NTO priority to zero (i.e., shut it off)
             plan.OptimizationSetup.AddAutomaticNormalTissueObjective(0.0);
             //be sure to set the dose value presentation to absolute! This is important for plan evaluation in the evaluateAndUpdatePlan method below

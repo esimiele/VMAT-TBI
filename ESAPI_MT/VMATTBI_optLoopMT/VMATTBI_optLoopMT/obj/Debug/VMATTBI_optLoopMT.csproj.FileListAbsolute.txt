@@ -103,3 +103,26 @@ Z:\ESimiele\Research\VMAT_TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\D
 Z:\ESimiele\Research\VMAT_TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3.g.resources
 Z:\ESimiele\Research\VMAT_TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3.exe
 Z:\ESimiele\Research\VMAT_TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3.pdb
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\bin\x64\Debug\VMATTBI_optLoopMT_v1.3.exe.config
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\bin\x64\Debug\VMATTBI_optLoopMT_v1.3.exe
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\bin\x64\Debug\VMATTBI_optLoopMT_v1.3.pdb
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\bin\x64\Debug\VMS.TPS.Common.Model.API.dll
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\bin\x64\Debug\VMS.TPS.Common.Model.Types.dll
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\bin\x64\Debug\VMS.TPS.Common.Model.API.xml
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\bin\x64\Debug\VMS.TPS.Common.Model.Types.xml
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT.csproj.AssemblyReference.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\MainWindow.g.cs
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\progressWindow.g.cs
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\App.g.cs
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3_MarkupCompile.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3_MarkupCompile.lref
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\MainWindow.baml
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\progressWindow.baml
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3.g.resources
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoop.confirmUI.resources
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT.Properties.Resources.resources
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT.csproj.GenerateResource.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT.csproj.CoreCompileInputs.cache
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT.csproj.CopyComplete
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3.exe
+C:\Users\Eric Simiele\Documents\GitHub\VMAT_TBI_doNotDelete\VMAT-TBI\ESAPI_MT\VMATTBI_optLoopMT\VMATTBI_optLoopMT\obj\Debug\VMATTBI_optLoopMT_v1.3.pdb
