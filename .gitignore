@@ -25,7 +25,6 @@ x64/
 *.meta
 *.obj
 *.pch
-*.pdb
 *.pgc
 *.pgd
 *.rsp
@@ -100,8 +99,6 @@ ClientBin/
 
 *.publishsettings
 *.lref
-*.pdb
-*.exe
 
 
 
