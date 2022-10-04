@@ -134,6 +134,8 @@ namespace VMATTBIautoPlan
         string contourFieldOverlapMargin = "1.0";
         //point this to the directory holding the documentation files
         string documentationPath = @"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\Users\ESimiele\Research\VMAT_TBI\documentation\";
+        //default course ID
+        string courseId = "VMAT TBI";
         //treatment units and associated photon beam energies
         List<string> linacs = new List<string> { "LA16", "LA17" };
         List<string> beamEnergies = new List<string> { "6X", "10X" };
@@ -151,7 +153,6 @@ namespace VMATTBIautoPlan
         string calculationModel = "AAA_15605";
         //photon optimization algorithm
         string optimizationModel = "PO_15605";
-
         //use GPU for dose calculation (not optimization)
         string useGPUdose = "false";
         //use GPU for optimization
@@ -227,6 +228,7 @@ namespace VMATTBIautoPlan
             else configTB.Text += String.Format("Configuration file: none") + System.Environment.NewLine + System.Environment.NewLine;
             configTB.Text += String.Format("Documentation path: {0}",documentationPath) + System.Environment.NewLine + System.Environment.NewLine;
             configTB.Text += String.Format("Default parameters:") + System.Environment.NewLine;
+            configTB.Text += String.Format("Course Id: {0}", courseId) + System.Environment.NewLine;
             configTB.Text += String.Format("Include flash by default: {0}", useFlashByDefault) + System.Environment.NewLine;
             configTB.Text += String.Format("Flash type: {0}", defaultFlashType) + System.Environment.NewLine;
             configTB.Text += String.Format("Flash margin: {0} cm", defaultFlashMargin) + System.Environment.NewLine;
@@ -1020,9 +1022,9 @@ namespace VMATTBIautoPlan
                 //convert from mm to cm
                 contourOverlapMargin *= 10.0;
                 //overloaded constructor for the placeBeams class
-                place = new placeBeams(selectedSS, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash, contourOverlapMargin);
+                place = new placeBeams(selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash, contourOverlapMargin);
             }
-            else place = new placeBeams(selectedSS, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash);
+            else place = new placeBeams(selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash);
 
             VMATplan = place.generate_beams();
             if (VMATplan == null) return;
@@ -1243,13 +1245,13 @@ namespace VMATTBIautoPlan
                     CUI.ShowDialog();
                     if (!CUI.confirm) return;
                     //search for a course named VMAT TBI. If it is found, search for a plan named _VMAT TBI inside the VMAT TBI course. If neither are found, throw an error and return
-                    if (!pi.Courses.Where(x => x.Id == "VMAT TBI").Any() || !pi.Courses.First(x => x.Id == "VMAT TBI").PlanSetups.Where(x => x.Id == "_VMAT TBI").Any())
+                    if (!pi.Courses.Where(x => x.Id == courseId).Any() || !pi.Courses.First(x => x.Id == courseId).PlanSetups.Where(x => x.Id == "_VMAT TBI").Any())
                     {
-                        MessageBox.Show("No course or plan named 'VMAT TBI' and '_VMAT TBI' found! Exiting...");
+                        MessageBox.Show(String.Format("No course or plan named '{0}' and '_VMAT TBI' found! Exiting...", courseId));
                         return;
                     }
                     //if both are found, grab an instance of that plan
-                    VMATplan = ((pi.Courses.First(x => x.Id == "VMAT TBI")).PlanSetups.First(x => x.Id == "_VMAT TBI") as ExternalPlanSetup);
+                    VMATplan = pi.Courses.First(x => x.Id == courseId).PlanSetups.First(x => x.Id == "_VMAT TBI") as ExternalPlanSetup;
                 }
                 pi.BeginModifications();
             }
@@ -1580,13 +1582,13 @@ namespace VMATTBIautoPlan
             if (prep == null)
             {
                 //this method assumes no prior knowledge, so it will have to retrive the number of isocenters (vmat and total) and isocenter names explicitly
-                Course c = pi.Courses.FirstOrDefault(x => x.Id.ToLower() == "vmat tbi");
+                Course c = pi.Courses.FirstOrDefault(x => x.Id.ToLower() == courseId.ToLower());
                 ExternalPlanSetup vmatPlan = null;
                 IEnumerable<ExternalPlanSetup> appaPlan = new List<ExternalPlanSetup> { };
                 if (c == null)
                 {
                     //vmat tbi course not found. Dealbreaker, exit method
-                    MessageBox.Show("VMAT TBI course not found! Exiting!");
+                    MessageBox.Show(String.Format("{0} course not found! Exiting!",courseId));
                     return;
                 }
                 else
@@ -1600,7 +1602,7 @@ namespace VMATTBIautoPlan
                     if (plans.Count() > 1)
                     {
                         selectItem SUI = new VMATTBIautoPlan.selectItem();
-                        SUI.title.Text = "Multiple plans found in VMAT TBI course!" + Environment.NewLine + "Please select a plan to prep!";
+                        SUI.title.Text = String.Format("Multiple plans found in {0} course!" + Environment.NewLine + "Please select a plan to prep!",courseId);
                         foreach (ExternalPlanSetup p in plans) SUI.itemCombo.Items.Add(p.Id);
                         SUI.itemCombo.Text = VMS.TPS.Script.GetScriptContext().ExternalPlanSetup.Id;
                         SUI.ShowDialog();
@@ -1764,7 +1766,7 @@ namespace VMATTBIautoPlan
                                             }
                                             b.Add(int.Parse(line.Substring(0, line.IndexOf("}"))));
                                             //only override the requested number of beams in the beamsPerIso array  
-                                            for (int i = 0; i < b.Count(); i++) { if(i < beamsPerIso.Count()) beamsPerIso[i] = b.ElementAt(i); }
+                                            for (int i = 0; i < b.Count(); i++) { if (i < beamsPerIso.Count()) beamsPerIso[i] = b.ElementAt(i); }
                                         }
                                         else if (parameter == "collimator rotations")
                                         {
@@ -1780,6 +1782,7 @@ namespace VMATTBIautoPlan
                                             c.Add(double.Parse(line.Substring(0, line.IndexOf("}"))));
                                             for (int i = 0; i < c.Count(); i++) { if (i < 5) collRot[i] = c.ElementAt(i); }
                                         }
+                                        else if (parameter == "course Id") courseId = value;
                                         else if (parameter == "use GPU for dose calculation") useGPUdose = value;
                                         else if (parameter == "use GPU for optimization") useGPUoptimization = value;
                                         else if (parameter == "MR level restart") MRrestartLevel = value;

@@ -206,20 +206,9 @@ namespace VMATTBI_optLoop
             {
                 app.ClosePatient();
                 pi = app.OpenPatientById(pat_mrn);
-                //grab instances of the course and VMAT tbi plans that were created using the binary plug in script. This is explicitly here to let the user know if there is a problem with the course OR plan
-                Course c = pi.Courses.FirstOrDefault(x => x.Id.ToLower() == "vmat tbi");
-                if (c == null)
-                {
-                    MessageBox.Show("No course named VMAT TBI!");
-                    return;
-                }
 
-                ExternalPlanSetup plan = c.ExternalPlanSetups.FirstOrDefault(x => x.Id.ToLower() == "_vmat tbi");
-                if (plan == null)
-                {
-                    MessageBox.Show("No plan named _VMAT TBI!");
-                    return;
-                }
+                ExternalPlanSetup plan = getPlan();
+                if (plan == null) return;
 
                 //populate the optimization stackpanel with the optimization parameters that were stored in the VMAT TBI plan
                 populateOptimizationTab(plan);
@@ -425,13 +414,17 @@ namespace VMATTBI_optLoop
 
         private ExternalPlanSetup getPlan()
         {
+            ExternalPlanSetup plan = null;
             //grab an instance of the VMAT TBI plan. Return null if it isn't found
             if (pi == null) return null;
-            Course c = pi.Courses.FirstOrDefault(x => x.Id.ToLower() == "vmat tbi");
-            if (c == null) return null;
-
-            ExternalPlanSetup plan = c.ExternalPlanSetups.FirstOrDefault(x => x.Id.ToLower() == "_vmat tbi");
-            if (plan == null) return null;
+            List<Course> courses = pi.Courses.ToList();
+            if (!courses.Any()) MessageBox.Show("No courses attached to patient!");
+            else
+            {
+                //look for plan with Id = '_VMAT TBI'
+                plan = courses.SelectMany(x => x.ExternalPlanSetups).FirstOrDefault(x => x.Id.ToLower() == "_vmat tbi");
+                if (plan == null) MessageBox.Show("No plan named _VMAT TBI!");
+            }
             return plan;
         }
 

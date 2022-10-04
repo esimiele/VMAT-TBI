@@ -20,10 +20,10 @@ namespace VMATTBIautoPlan
         bool checkIsoPlacement = false;
         double checkIsoPlacementLimit = 5.0;
         double isoSeparation = 0;
-        Patient pi;
         StructureSet selectedSS;
         Structure target = null;
         Tuple<int, DoseValue> prescription;
+        string courseId = "";
         Course tbi;
         public ExternalPlanSetup plan = null;
         ExternalPlanSetup legs_planUpper = null;
@@ -46,10 +46,10 @@ namespace VMATTBIautoPlan
         private double contourOverlapMargin;
         public List<Structure> jnxs = new List<Structure> { };
 
-        public placeBeams(StructureSet ss, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash)
+        public placeBeams(StructureSet ss, string cid, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash)
         {
             selectedSS = ss;
-            pi = selectedSS.Patient;
+            courseId = cid;
             prescription = presc;
             isoNames = new List<string>(i);
             numIsos = iso;
@@ -70,10 +70,10 @@ namespace VMATTBIautoPlan
             useFlash = flash;
         }
 
-        public placeBeams(StructureSet ss, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash, double overlapMargin)
+        public placeBeams(StructureSet ss, string cid, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash, double overlapMargin)
         {
             selectedSS = ss;
-            pi = selectedSS.Patient;
+            courseId = cid;
             prescription = presc;
             isoNames = new List<string>(i);
             numIsos = iso;
@@ -110,13 +110,13 @@ namespace VMATTBIautoPlan
 
         private bool createPlan()
         {
-            //look for a course name VMAT TBI. If it does not exit, create it, otherwise load it into memory
-            if (!selectedSS.Patient.Courses.Where(x => x.Id == "VMAT TBI").Any())
+            //look for a course with Id specified by the user. If it does not exit, create it, otherwise load it into memory
+            if (!selectedSS.Patient.Courses.Where(x => x.Id == courseId).Any())
             {
                 if (selectedSS.Patient.CanAddCourse())
                 {
                     tbi = selectedSS.Patient.AddCourse();
-                    tbi.Id = "VMAT TBI";
+                    tbi.Id = courseId;
                 }
                 else
                 {
@@ -124,7 +124,7 @@ namespace VMATTBIautoPlan
                     return true;
                 }
             }
-            else tbi = selectedSS.Patient.Courses.FirstOrDefault(x => x.Id == "VMAT TBI");
+            else tbi = selectedSS.Patient.Courses.FirstOrDefault(x => x.Id == courseId);
 
             //6-10-2020 EAS, research system only!
             //if (tbi.ExternalPlanSetups.Where(x => x.Id == "_VMAT TBI").Any()) if (tbi.CanRemovePlanSetup((tbi.ExternalPlanSetups.First(x => x.Id == "_VMAT TBI")))) tbi.RemovePlanSetup(tbi.ExternalPlanSetups.First(x => x.Id == "_VMAT TBI"));
