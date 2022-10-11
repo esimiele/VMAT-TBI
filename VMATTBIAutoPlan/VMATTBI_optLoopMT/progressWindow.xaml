@@ -1,0 +1,26 @@
+﻿<Window x:Class="VMATTBI_optLoop.progressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VMATTBI_optLoop"
+        mc:Ignorable="d"
+        HorizontalAlignment="Center" Height="605" Width="815" Background="DarkGray" Closing="Window_Closing">
+    <Grid>
+        <Label Content="Progress of Optimization Loop" FontSize="20" FontWeight="Bold" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="5"></Label>
+        <ScrollViewer x:Name ="scroller" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="795" Height="490" Margin="0,0,0,35" BorderBrush="Black">
+            <TextBlock x:Name="update" FontSize="12" FontFamily="Courier New" Width="775" Background="White" ></TextBlock>
+        </ScrollViewer>
+        <Button x:Name="abort" Content="Abort" HorizontalAlignment="Left" Height="20" Width="70" Margin="35,0,0,6" VerticalAlignment="Bottom" Click="Abort_Click"/>
+        <TextBox x:Name="abortStatus" TextAlignment="Center" Background="White" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="20" Width="120" Margin="125,0,0,6"></TextBox>
+        <Button x:Name="write" Content="Write results to file" HorizontalAlignment="Left" Height="20" Width="120" Margin="295,0,0,6" VerticalAlignment="Bottom" Click="WriteResults_Click"/>
+        <Grid Width="210" Height="29" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,135,2">
+            <Label Content="Progress: " VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,150,0"></Label>
+            <ProgressBar HorizontalAlignment="Right" Height="20" Margin="0,0,0,0" VerticalAlignment="Center" Width="150" Minimum="0" Maximum="100" Foreground="LimeGreen" Name="progress"/>
+            <TextBlock Text="{Binding ElementName=progress, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,65,0" />
+        </Grid>
+        <TextBlock x:Name="runTime" FontSize="16" Width="100" TextAlignment="Center" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,5,8" Foreground="Black"></TextBlock>
+    </Grid>
+</Window>
+    
+    
