@@ -1,6 +1,12 @@
-updated 4/21/2022
+updated 10/11/2022
 
-Changes from previous push (4/10/2022):
+Changes from 10/4/22 push:
+-Addressed issues #12 (Spinning Manny Notice) and #14 (default course name)
+-Prior push history not shown due to merge conflicts, had to force push
+-restructed code so now both projects are under one solution and build to the bin/ folder in the top directory
+	-This makes it much easier to maintain the code and especially the configuration file as now only one configuration file is needed in the bin folder
+
+Changes from 4/10/2022 push:
 -added option to specify number of VMAT isocenters in the GUI (up to a maximum of 4).
 -fixed an issue where flash could be added to the body structure multiple times. Now the script can be run on the same structure set multiple times without generating flash multiple times
 -fixed an issue regarding GPU dose calculation option
@@ -17,11 +23,11 @@ You need to modify the .ini configuration file inside the /bin/x64/debug directo
 I will work to update the scripts using build configurations so it is easy to rebuild the scripts according to the Eclipse version at your clinic.
 
 Latest code versions:
-Plug-in --> v1.8
-Executable --> v1.3
+Plug-in --> v1.9
+Executable --> v1.5
 
-ESAPI/Projects/VMATTBIautoPlan --> binary plug in
-ESAPI_MT/VMATTBI_optLoopMT --> stand-alone executable
+VMATTBIAutoplan/VMATTBIautoPlan --> binary plug in
+VMATTBIAutoplan/VMATTBI_optLoopMT --> stand-alone executable
 
 Some important notes to make the scripts run:
 binary plug-in:
