@@ -1,4 +1,10 @@
-updated 10/11/2022
+updated 10/14/2022
+
+Changes from 10/11/2022 push:
+-Added initial functionality for all VMAT fields (AP/PA fields will NOT be generated)
+-To use this feature, set the 'all fields VMAT' option in the configuration file to 'true'
+-WARNING: this feature is not completed yet and has only been through limited testing --> Use at your own risk
+	-Still need to add code to properly separate the fields in each isocenter (MLC positions and control points need to be reversed)
 
 Changes from 10/4/22 push:
 -Addressed issues #12 (Spinning Manny Notice) and #14 (default course name)
