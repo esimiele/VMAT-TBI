@@ -33,6 +33,8 @@ namespace VMATTBIautoPlan
                     isoNames.Add("Chest");
                     if (numVMATIsos == 3) isoNames.Add("Legs");
                     else if (numVMATIsos == 4) { isoNames.Add("Pelvis"); isoNames.Add("Legs"); }
+                    else if (numVMATIsos == 5) { isoNames.Add("Abdomen"); isoNames.Add("Pelvis"); isoNames.Add("Legs"); }
+                    else if (numVMATIsos == 6) { isoNames.Add("Abdomen"); isoNames.Add("Pelvis"); isoNames.Add("Upper Legs"); isoNames.Add("Lower Legs"); }
                 }
             }
             return isoNames;

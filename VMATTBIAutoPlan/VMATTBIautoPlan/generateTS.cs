@@ -27,12 +27,14 @@ namespace VMATTBIautoPlan
         public List<string> isoNames = new List<string> { };
         private double targetMargin;
         private bool scleroTrial;
+        private bool allVMAT;
+        public int extraIsos = 0;
         private bool useFlash = false;
         private Structure flashStructure = null;
         private double flashMargin;
         public bool updateSparingList = false;
 
-        public generateTS(List<Tuple<string,string>> ts, List<Tuple<string, string>> sclero_ts, List<Tuple<string, string, double>> list, StructureSet ss, double tm, bool st)
+        public generateTS(List<Tuple<string,string>> ts, List<Tuple<string, string>> sclero_ts, List<Tuple<string, string, double>> list, StructureSet ss, double tm, bool st, bool vmat)
         {
             TS_structures = new List<Tuple<string, string>>(ts);
             scleroStructures = new List<Tuple<string, string>>(sclero_ts);
@@ -40,9 +42,10 @@ namespace VMATTBIautoPlan
             selectedSS = ss;
             targetMargin = tm;
             scleroTrial = st;
+            allVMAT = vmat;
         }
 
-        public generateTS(List<Tuple<string, string>> ts, List<Tuple<string, string>> sclero_ts, List<Tuple<string, string, double>> list, StructureSet ss, double tm, bool st, bool flash, Structure fSt, double fM)
+        public generateTS(List<Tuple<string, string>> ts, List<Tuple<string, string>> sclero_ts, List<Tuple<string, string, double>> list, StructureSet ss, double tm, bool st, bool vmat, bool flash, Structure fSt, double fM)
         {
             //overloaded constructor for the case where the user wants to include flash in the simulation
             TS_structures = new List<Tuple<string, string>>(ts);
@@ -51,6 +54,7 @@ namespace VMATTBIautoPlan
             selectedSS = ss;
             targetMargin = tm;
             scleroTrial = st;
+            allVMAT = vmat;
             useFlash = flash;
             flashStructure = fSt;
             flashMargin = fM;
@@ -71,14 +75,14 @@ namespace VMATTBIautoPlan
             //check if user origin was set
             //get the points collection for the Body (used for calculating number of isocenters)
             Point3DCollection pts = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "body").MeshGeometry.Positions;
-            if (!selectedSS.Image.HasUserOrigin || !(selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "body").IsPointInsideSegment(selectedSS.Image.UserOrigin)))
+            if (!selectedSS.Image.HasUserOrigin || !selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "body").IsPointInsideSegment(selectedSS.Image.UserOrigin))
             {
                 MessageBox.Show("Did you forget to set the user origin? \nUser origin is NOT inside body contour! \nPlease fix and try again!");
                 return true;
             }
 
             //check if patient length is > 116cm, if so, check for matchline contour
-            if ((pts.Max(p => p.Z) - pts.Min(p => p.Z)) > 1160.0 && !(selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any()))
+            if ((pts.Max(p => p.Z) - pts.Min(p => p.Z)) > 1160.0 && !selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any())
             {
                 //check to see if the user wants to proceed even though there is no matchplane contour or the matchplane contour exists, but is not filled
                 VMATTBIautoPlan.confirmUI CUI = new VMATTBIautoPlan.confirmUI();
@@ -90,12 +94,12 @@ namespace VMATTBIautoPlan
             }
 
             //calculate number of required isocenters
-            if (!(selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any()))
+            if (!selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any())
             {
                 //no matchline implying that this patient will be treated with VMAT only. For these cases the maximum number of allowed isocenters is 3.
-                //the reason for the explicit statements calculating the number of isos and then truncating them to 3 was to account for patients requiring < 3 isos and if, later on, we want to remove the restriction of 3 isos
-                numIsos = numVMATIsos = (int)Math.Ceiling(((pts.Max(p => p.Z) - pts.Min(p => p.Z)) / (400.0 - 20.0)));
-                if (numIsos > 3) numIsos = numVMATIsos = 3;
+                //the reason for the explicit statements calculating the number of isos and then truncating them to 4 was to account for patients requiring < 4 isos and if, later on, we want to remove the restriction of 4 isos
+                numIsos = numVMATIsos = (int)Math.Ceiling((pts.Max(p => p.Z) - pts.Min(p => p.Z)) / (400.0 - 20.0));
+                if (numIsos > 4) numIsos = numVMATIsos = 4;
             }
             else
             {
@@ -108,22 +112,24 @@ namespace VMATTBIautoPlan
                     if (!CUI.confirm) return true;
 
                     //continue and ignore the empty matchline structure (same calculation as VMAT only)
-                    numIsos = numVMATIsos = (int)Math.Ceiling(((pts.Max(p => p.Z) - pts.Min(p => p.Z)) / (400.0 - 20.0)));
-                    if (numIsos > 3) numIsos = numVMATIsos = 3;
+                    numIsos = numVMATIsos = (int)Math.Ceiling((pts.Max(p => p.Z) - pts.Min(p => p.Z)) / (400.0 - 20.0));
+                    if (numIsos > 4) numIsos = numVMATIsos = 4;
                 }
                 //matchline structure is present and not empty
                 else
                 {
                     //get number of isos for PTV superior to matchplane (always truncate this value to a maximum of 4 isocenters)
-                    numVMATIsos = (int)Math.Ceiling(((pts.Max(p => p.Z) - selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z) / (400.0 - 20.0)));
+                    numVMATIsos = (int)Math.Ceiling((pts.Max(p => p.Z) - selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z) / (400.0 - 20.0));
                     if (numVMATIsos > 4) numVMATIsos = 4;
 
                     //get number of iso for PTV inferior to matchplane
                     //if (selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z - pts.Min(p => p.Z) - 3.0 <= (400.0 - 20.0)) numIsos = numVMATIsos + 1;
 
                     //5-20-2020 Nataliya said to only add a second legs iso if the extent of the TS_PTV_LEGS is > 40.0 cm
-                    if (selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z - pts.Min(p => p.Z) - 3.0 <= (400.0 - 0.0)) numIsos = numVMATIsos + 1;
-                    else numIsos = numVMATIsos + 2;
+                    if (selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z - pts.Min(p => p.Z) - 3.0 <= (400.0 - 0.0)) extraIsos = 1;
+                    else extraIsos = 2;
+                    if (!allVMAT) numIsos = numVMATIsos + extraIsos;
+                    else { numVMATIsos += extraIsos; numIsos = numVMATIsos; }
                     //MessageBox.Show(String.Format("{0}", selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z - pts.Min(p => p.Z) - 3.0));
                 }
             }
@@ -319,7 +325,7 @@ namespace VMATTBIautoPlan
             {
                 Structure tmp = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == s.ToLower());
                 //MessageBox.Show(s);
-                if (!(s.ToLower().Contains("ptv")))
+                if (!s.ToLower().Contains("ptv"))
                 {
                     Structure tmp1 = null;
                     double margin = 0.0;
@@ -370,7 +376,7 @@ namespace VMATTBIautoPlan
                     tmp.SegmentVolume = tmp1.Margin(0.0);
 
                     //matchplane exists and needs to be cut from TS_PTV_Body. Also remove all TS_PTV_Body segements inferior to match plane
-                    if (selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any())
+                    if (!allVMAT && selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any())
                     {
                         //find the image plane where the matchline is location. Record this value and break the loop. Also find the first slice where the ptv_body contour starts and record this value
                         Structure matchline = selectedSS.Structures.First(x => x.Id.ToLower() == "matchline");
@@ -469,7 +475,7 @@ namespace VMATTBIautoPlan
             bolus.SetAssignedHU(0.0);
             //crop flash at matchline ONLY if global flash is used
             Structure dummyBox = null;
-            if (flashStructure == null && selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any() && !selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").IsEmpty)
+            if (flashStructure == null && !allVMAT && selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any() && !selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").IsEmpty)
             {
                 dummyBox = selectedSS.Structures.First(x => x.Id.ToLower() == "dummybox");
                 bolus.SegmentVolume = bolus.Sub(dummyBox.Margin(0.0));
@@ -512,7 +518,7 @@ namespace VMATTBIautoPlan
 
             //now we need to cut ts_ptv_flash at the matchline and remove all contours below the matchline (basically the same process as generating ts_ptv_vmat in the createTSStructures method)
             //need another if-statement here to create ts_legs_flash if necessary
-            if (selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any() && !selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").IsEmpty)
+            if (!allVMAT && selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any() && !selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").IsEmpty)
             {
                 //grab dummy box if not retrieved. There might be a case were local flash was used so the dummy box was NOT retrieved in the previous if-statement
                 if(dummyBox == null) dummyBox = selectedSS.Structures.First(x => x.Id.ToLower() == "dummybox");

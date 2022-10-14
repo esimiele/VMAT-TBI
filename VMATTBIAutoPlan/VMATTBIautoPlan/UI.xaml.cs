@@ -136,6 +136,10 @@ namespace VMATTBIautoPlan
         string documentationPath = @"\\enterprise.stanfordmed.org\depts\RadiationTherapy\Public\Users\ESimiele\Research\VMAT_TBI\documentation\";
         //default course ID
         string courseId = "VMAT TBI";
+        //assign technique as VMAT for all fields
+        bool allVMAT = false;
+        //used to keep track of how many VMAT isocenters should be inferior to matchline
+        int extraIsos = 0;
         //treatment units and associated photon beam energies
         List<string> linacs = new List<string> { "LA16", "LA17" };
         List<string> beamEnergies = new List<string> { "6X", "10X" };
@@ -229,6 +233,7 @@ namespace VMATTBIautoPlan
             configTB.Text += String.Format("Documentation path: {0}",documentationPath) + System.Environment.NewLine + System.Environment.NewLine;
             configTB.Text += String.Format("Default parameters:") + System.Environment.NewLine;
             configTB.Text += String.Format("Course Id: {0}", courseId) + System.Environment.NewLine;
+            configTB.Text += String.Format("Assign VMAT technique to all fields: {0}", allVMAT) + System.Environment.NewLine;
             configTB.Text += String.Format("Include flash by default: {0}", useFlashByDefault) + System.Environment.NewLine;
             configTB.Text += String.Format("Flash type: {0}", defaultFlashType) + System.Environment.NewLine;
             configTB.Text += String.Format("Flash margin: {0} cm", defaultFlashMargin) + System.Environment.NewLine;
@@ -595,7 +600,7 @@ namespace VMATTBIautoPlan
             {
                 //check to ensure the structures in the templateList vector are actually present in the selected structure set and are actually contoured. If they are, add them to the defaultList vector, which will be passed 
                 //to the add_sp_volumes method
-                if (!(selectedSS.Structures.Where(x => x.Id.ToLower() == itr.Item1.ToLower())).Any())
+                if (!selectedSS.Structures.Where(x => x.Id.ToLower() == itr.Item1.ToLower()).Any())
                 {
                     if (missCount == 0) missOutput = String.Format("Warning! The following default structures are missing from the selected structure list:\n");
                     missOutput += String.Format("{0}\n", itr.Item1);
@@ -743,8 +748,8 @@ namespace VMATTBIautoPlan
             //The scleroderma trial contouring/margins are specific to the trial, so this trial needs to be handled separately from the generic VMAT treatment type
             VMATTBIautoPlan.generateTS generate;
             //overloaded constructor depending on if the user requested to use flash or not. If so, pass the relevant flash parameters to the generateTS class
-            if (!useFlash) generate = new VMATTBIautoPlan.generateTS(TS_structures, scleroStructures, structureSpareList, selectedSS, targetMargin, sclero_chkbox.IsChecked.Value);
-            else generate = new VMATTBIautoPlan.generateTS(TS_structures, scleroStructures, structureSpareList, selectedSS, targetMargin, sclero_chkbox.IsChecked.Value, useFlash, flashStructure, flashMargin);
+            if (!useFlash) generate = new VMATTBIautoPlan.generateTS(TS_structures, scleroStructures, structureSpareList, selectedSS, targetMargin, sclero_chkbox.IsChecked.Value, allVMAT);
+            else generate = new VMATTBIautoPlan.generateTS(TS_structures, scleroStructures, structureSpareList, selectedSS, targetMargin, sclero_chkbox.IsChecked.Value, allVMAT, useFlash, flashStructure, flashMargin);
             pi.BeginModifications();
             if (generate.generateStructures()) return;
             //does the structure sparing list need to be updated? This occurs when structures the user elected to spare with option of 'Mean Dose < Rx Dose' are high resolution. Since Eclipse can't perform
@@ -762,6 +767,7 @@ namespace VMATTBIautoPlan
             numIsos = generate.numIsos;
             numVMATIsos = generate.numVMATIsos;
             isoNames = generate.isoNames;
+            if (allVMAT) extraIsos = generate.extraIsos;
 
             //get prescription
             if (double.TryParse(dosePerFx.Text, out double dose_perFx) && int.TryParse(numFx.Text, out int numFractions)) prescription = Tuple.Create(numFractions, new DoseValue(dose_perFx, DoseValue.DoseUnit.cGy));
@@ -931,7 +937,8 @@ namespace VMATTBIautoPlan
             else if (VMATplan != null) MessageBox.Show("Error! VMAT plan has already been generated! Cannot place beams again!");
             else if (!int.TryParse(numVMATisosTB.Text, out tmp)) MessageBox.Show("Error! Requested number of VMAT isocenters is NaN! Please try again!");
             else if (tmp == numVMATIsos) MessageBox.Show("Warning! Requested number of VMAT isocenters = current number of VMAT isocenters!");
-            else if (tmp < 2 || tmp > 4) MessageBox.Show("Error! Requested number of VMAT isocenters is less than 2 or greater than 4! Please try again!");
+            else if (!allVMAT && (tmp < 2 || tmp > 4)) MessageBox.Show("Error! Requested number of VMAT isocenters is less than 2 or greater than 4! Please try again!");
+            else if (allVMAT && (tmp < 2 || tmp > 6)) MessageBox.Show("Error! Requested number of VMAT isocenters is less than 2 or greater than 69! Please try again!");
             else
             {
                 if (!optParameters.Where(x => x.Item1.ToLower().Contains("brain")).Any()) beamsPerIso[0]++;
@@ -1022,9 +1029,9 @@ namespace VMATTBIautoPlan
                 //convert from mm to cm
                 contourOverlapMargin *= 10.0;
                 //overloaded constructor for the placeBeams class
-                place = new placeBeams(selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash, contourOverlapMargin);
+                place = new placeBeams(allVMAT, extraIsos, selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash, contourOverlapMargin);
             }
-            else place = new placeBeams(selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash);
+            else place = new placeBeams(allVMAT, extraIsos, selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash);
 
             VMATplan = place.generate_beams();
             if (VMATplan == null) return;
@@ -1783,6 +1790,7 @@ namespace VMATTBIautoPlan
                                             for (int i = 0; i < c.Count(); i++) { if (i < 5) collRot[i] = c.ElementAt(i); }
                                         }
                                         else if (parameter == "course Id") courseId = value;
+                                        else if (parameter == "all fields VMAT") { if (value != "") allVMAT = bool.Parse(value); }
                                         else if (parameter == "use GPU for dose calculation") useGPUdose = value;
                                         else if (parameter == "use GPU for optimization") useGPUoptimization = value;
                                         else if (parameter == "MR level restart") MRrestartLevel = value;
