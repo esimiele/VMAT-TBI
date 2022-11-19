@@ -743,7 +743,19 @@ namespace VMATTBIautoPlan
                 }
                 else headerObj = false;
             }
-
+            ///////////////////////////////////////
+            // insert code here for If Rx = 13.2Gy, crop Lung+5mm instead of 3mm, inform user 
+            if (double.Parse(dosePerFx.Text) * double.Parse(numFx.Text)/100 >= 13.2)
+            {
+                MessageBox.Show("Prescribed dose is greater than 13.2 Gy. Lungs will be cropped +5 mm instead of +3 mm");
+                //defaultSpareStruct[0] = new Tuple<string, string, double>("Lungs", "Mean Dose < Rx Dose", 0.5);
+                int idx = structureSpareList.FindIndex(x => x.Item1.ToLower() == "lungs" & x.Item2.ToLower().Contains("mean") & x.Item3 == 0.3);
+                structureSpareList.RemoveAt(idx);
+                structureSpareList.Add(new Tuple<string, string, double>("Lungs", "Mean Dose < Rx Dose", 0.5));
+                clear_spare_list();
+                add_sp_volumes(selectedSS, structureSpareList);
+            }
+            ///////////////////////////////////////
             //create an instance of the generateTS class, passing the structure sparing list vector, the selected structure set, and if this is the scleroderma trial treatment regiment
             //The scleroderma trial contouring/margins are specific to the trial, so this trial needs to be handled separately from the generic VMAT treatment type
             VMATTBIautoPlan.generateTS generate;
