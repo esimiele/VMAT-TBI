@@ -214,6 +214,23 @@ namespace VMATTBIautoPlan
             if(useFlash) target = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "ts_flash_target");
             else target = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "ptv_body");
 
+            ///////////////////
+            Structure couchSurface = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "couchsurface");
+            double TT = 0;
+            //check if couch is present. Warn if not found, otherwise it is the separation between the the beam isocenter position and the minimum y-position of the couch surface (in dicom coordinates)
+            if (couchSurface == null) MessageBox.Show("Warning! No couch surface structure found!");
+            else TT = (userOrigin.y - couchSurface.MeshGeometry.Positions.Min(p => p.Y)) / 10;
+            
+            // if couch vertical is greater than 17.5 then assign vertical of 17.5
+            double offsetY = 0.0;
+            if (TT < -17.5)
+            {
+                MessageBox.Show(string.Format("Couch vertical is {0} cm! \n Couch vertical default to 17.5 cm", TT));
+                offsetY = TT + 17.5;
+
+            }
+            offsetY *= 10;
+            /////////////
             //matchline is present and not empty
             if (selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any() && !selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").IsEmpty)
             {
@@ -241,7 +258,7 @@ namespace VMATTBIautoPlan
                 {
                     VVector v = new VVector();
                     v.x = userOrigin.x;
-                    v.y = userOrigin.y;
+                    v.y = userOrigin.y - offsetY;
                     //6-10-2020 EAS, want to count up from matchplane to ensure distance from matchplane is fixed at 190 mm
                     v.z = matchlineZ + i * isoSeparationSup + 190.0;
                     //round z position to the nearest integer
@@ -260,7 +277,7 @@ namespace VMATTBIautoPlan
                 {
                     VVector v = new VVector();
                     v.x = userOrigin.x;
-                    v.y = userOrigin.y;
+                    v.y = userOrigin.y - offsetY;
                     //5-11-2020 update EAS (the first isocenter immediately inferior to the matchline is now a distance = offset away). This ensures the isocenters immediately inferior and superior to the 
                     //matchline are equidistant from the matchline
                     v.z = matchlineZ - i * isoSeparationInf - offset;
@@ -298,7 +315,7 @@ namespace VMATTBIautoPlan
                 {
                     VVector v = new VVector();
                     v.x = userOrigin.x;
-                    v.y = userOrigin.y;
+                    v.y = userOrigin.y - offsetY;
                     //5-7-2020 isocenter positions for actual isocenter separation equation described above
                     v.z = target.MeshGeometry.Positions.Max(p => p.Z) - i * isoSeparation - 190.0;
                     //round z position to the nearest integer
