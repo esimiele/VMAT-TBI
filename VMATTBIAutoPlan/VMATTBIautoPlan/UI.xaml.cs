@@ -744,6 +744,31 @@ namespace VMATTBIautoPlan
                 else headerObj = false;
             }
 
+            ///////////////////////////////////////
+            //modified from iromero77's pull request #20
+            // If Rx >= 13.2Gy, crop Lung+5mm instead of 3mm, suggest increasing cropping margin
+            if (double.Parse(dosePerFx.Text) * double.Parse(numFx.Text) >= 1320)
+            {
+                if(structureSpareList.FirstOrDefault(x => x.Item1.ToLower() == "lungs" && x.Item2 == "Mean Dose < Rx Dose" && x.Item3 < 0.5) != null)
+                {
+                    confirmUI CUI = new confirmUI();
+                    CUI.message.Text = "Prescribed dose is greater than 13.2 Gy!" + Environment.NewLine + "I recommend increasing the cropping margin to 5 mm (to ensure lung sparing)." + Environment.NewLine + Environment.NewLine + "Increase lung crop margin to 5mm?";
+                    CUI.button1.Text = "No";
+                    CUI.button2.Text = "Yes";
+                    CUI.ShowDialog();
+                    if(CUI.confirm)
+                    {
+                        int idx = structureSpareList.FindIndex(x => x.Item1.ToLower() == "lungs" & x.Item2.ToLower().Contains("mean") & x.Item3 == 0.3);
+                        structureSpareList.RemoveAt(idx);
+                        if (idx > structureSpareList.Count) structureSpareList.Add(new Tuple<string, string, double>("Lungs", "Mean Dose < Rx Dose", 0.5));
+                        else structureSpareList.Insert(idx, new Tuple<string, string, double>("Lungs", "Mean Dose < Rx Dose", 0.5));
+                        clear_spare_list();
+                        add_sp_volumes(selectedSS, structureSpareList);
+                    }
+                }
+            }
+            ///////////////////////////////////////
+
             //create an instance of the generateTS class, passing the structure sparing list vector, the selected structure set, and if this is the scleroderma trial treatment regiment
             //The scleroderma trial contouring/margins are specific to the trial, so this trial needs to be handled separately from the generic VMAT treatment type
             VMATTBIautoPlan.generateTS generate;
