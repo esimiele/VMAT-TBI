@@ -1,4 +1,6 @@
 updated 12/8/2022
+-Known issues
+	-if there are multiple _VMAT TBI plans under separate courses, the executable will ask you to select a course every time you add a constraint, get constraints from plan, start the optimization loop, or open a patient. This will be fixed in the near future
 
 Changes from 10/14/2022
 -fixed issue #24 (Wrong course found)
