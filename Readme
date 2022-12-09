@@ -1,4 +1,9 @@
-updated 10/14/2022
+updated 12/8/2022
+
+Changes from 10/14/2022
+-fixed issue #24 (Wrong course found)
+-modified and incorporated pull request #20 (iromero77)
+-stand-alone executable generates VMS.TPS Application instance in constructor of MainWindow and does not crash program if it fails
 
 Changes from 10/11/2022 push:
 -Added initial functionality for all VMAT fields (AP/PA fields will NOT be generated)
@@ -29,8 +34,8 @@ You need to modify the .ini configuration file inside the /bin/x64/debug directo
 I will work to update the scripts using build configurations so it is easy to rebuild the scripts according to the Eclipse version at your clinic.
 
 Latest code versions:
-Plug-in --> v1.9
-Executable --> v1.5
+Plug-in --> v2.0
+Executable --> v1.6
 
 VMATTBIAutoplan/VMATTBIautoPlan --> binary plug in
 VMATTBIAutoplan/VMATTBI_optLoopMT --> stand-alone executable
