@@ -106,6 +106,7 @@
             this.Controls.Add(this.info);
             this.Controls.Add(this.title);
             this.Name = "enterMissingInfo";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "enterLinacName";
             this.ResumeLayout(false);
             this.PerformLayout();

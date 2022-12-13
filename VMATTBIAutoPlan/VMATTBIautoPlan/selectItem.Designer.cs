@@ -85,6 +85,7 @@
             this.Controls.Add(this.itemCombo);
             this.Controls.Add(this.title);
             this.Name = "selectItem";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "selectItem";
             this.ResumeLayout(false);
             this.PerformLayout();

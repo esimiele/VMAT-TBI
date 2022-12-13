@@ -2,6 +2,12 @@ updated 12/8/2022
 -Known issues
 	-if there are multiple _VMAT TBI plans under separate courses, the executable will ask you to select a course every time you add a constraint, get constraints from plan, start the optimization loop, or open a patient. This will be fixed in the near future
 
+Changes from 12/8/2022
+-fixed issue where multiple _VMAT TBI plans in separate courses caused the executable to ask the user multiple times to select a course whenever you add a constraint, get constraints from plan, start optimization loop, open a patient, etc.
+-modified and incorporated pull request #22 (iromero77)
+    -now the plugin has the feature of being able to check for potential collisions between the couch and linac
+-revised window open location for all windows in plugin script
+
 Changes from 10/14/2022
 -fixed issue #24 (Wrong course found)
 -modified and incorporated pull request #20 (iromero77)
@@ -36,8 +42,8 @@ You need to modify the .ini configuration file inside the /bin/x64/debug directo
 I will work to update the scripts using build configurations so it is easy to rebuild the scripts according to the Eclipse version at your clinic.
 
 Latest code versions:
-Plug-in --> v2.0
-Executable --> v1.6
+Plug-in --> v2.1
+Executable --> v1.7
 
 VMATTBIAutoplan/VMATTBIautoPlan --> binary plug in
 VMATTBIAutoplan/VMATTBI_optLoopMT --> stand-alone executable

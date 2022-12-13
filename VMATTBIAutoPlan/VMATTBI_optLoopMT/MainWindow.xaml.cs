@@ -104,6 +104,7 @@ namespace VMATTBI_optLoop
         bool runOneMoreOpt = false;
         bool copyAndSavePlanItr = false;
         bool useFlash = false;
+        ExternalPlanSetup VMATTBIPlan = null;
 
         public MainWindow()
         {
@@ -204,14 +205,15 @@ namespace VMATTBI_optLoop
             {
                 app.ClosePatient();
                 pi = app.OpenPatientById(pat_mrn);
+                if(pi == null) { MessageBox.Show(String.Format("No Patient found with MRN: {0}! Please double check entered MRN and try again!", pat_mrn)); return; }
 
-                ExternalPlanSetup plan = getPlan();
-                if (plan == null) return;
+                VMATTBIPlan = getPlan();
+                if (VMATTBIPlan == null) { MessageBox.Show(String.Format("No plans named _VMAT TBI found for patient: {0}! Close this script, and run the plugin script to generate the _VMAT TBI plan for optimization!", pat_mrn)); return; }
 
                 //populate the optimization stackpanel with the optimization parameters that were stored in the VMAT TBI plan
-                populateOptimizationTab(plan);
+                populateOptimizationTab(VMATTBIPlan);
                 //populate the prescription text boxes with the prescription stored in the VMAT TBI plan
-                populateRx(plan);
+                populateRx(VMATTBIPlan);
                 //set the default parameters for the optimization loop
                 runCoverageCk.IsChecked = runCoverageCheckOption;
                 numOptLoops.Text = defautlNumOpt;
@@ -276,9 +278,8 @@ namespace VMATTBI_optLoop
         private void getOptFromPlan_Click(object sender, RoutedEventArgs e)
         {
             if (app == null) return;
-            ExternalPlanSetup plan = getPlan();
-            if (plan == null) return;
-            else populateOptimizationTab(plan);
+            if (VMATTBIPlan == null) return;
+            populateOptimizationTab(VMATTBIPlan);
         }
 
         private void startOpt_Click(object sender, RoutedEventArgs e)
@@ -297,8 +298,7 @@ namespace VMATTBI_optLoop
                 return;
             }
             //get an instnace of the VMAT TBI plan
-            ExternalPlanSetup plan = getPlan();
-            if (plan == null) return;
+            if (VMATTBIPlan == null) return;
 
             if(!double.TryParse(targetNormTB.Text, out double planNorm))
             {
@@ -382,7 +382,7 @@ namespace VMATTBI_optLoop
 
             //start the optimization loop (all saving to the database is performed in the progressWindow class)
             pi.BeginModifications();
-            optimizationLoop optLoop = new optimizationLoop(plan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, threshold, lowDoseLimit, demo, checkSpinningManny, logFilePath, app);
+            optimizationLoop optLoop = new optimizationLoop(VMATTBIPlan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, threshold, lowDoseLimit, demo, checkSpinningManny, logFilePath, app);
         }
 
         private void ConstructPlanObjectives()
@@ -405,10 +405,9 @@ namespace VMATTBI_optLoop
         {
             if (app == null) return;
             //add a blank contraint to the list
-            ExternalPlanSetup plan = getPlan();
-            if (plan != null)
+            if (VMATTBIPlan != null)
             {
-                add_opt_volumes(plan.StructureSet, new List<Tuple<string, string, double, double, int>> { Tuple.Create("--select--", "--select--", 0.0, 0.0, 0) });
+                add_opt_volumes(VMATTBIPlan.StructureSet, new List<Tuple<string, string, double, double, int>> { Tuple.Create("--select--", "--select--", 0.0, 0.0, 0) });
                 optParamScroller.ScrollToBottom();
             }
         }

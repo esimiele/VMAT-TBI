@@ -21,6 +21,7 @@ namespace VMATTBIautoPlan
         double checkIsoPlacementLimit = 5.0;
         double isoSeparation = 0;
         bool allVMAT = false;
+        bool checkTTCollision = false;
         int extraIsocenters = 0;
         StructureSet selectedSS;
         Structure target = null;
@@ -49,10 +50,11 @@ namespace VMATTBIautoPlan
         private double contourOverlapMargin;
         public List<Structure> jnxs = new List<Structure> { };
 
-        public placeBeams(bool vmat, int extra, StructureSet ss, string cid, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash)
+        public placeBeams(bool vmat, int extra, bool collision, StructureSet ss, string cid, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash)
         {
             allVMAT = vmat;
             extraIsocenters = extra;
+            checkTTCollision = collision;
             selectedSS = ss;
             courseId = cid;
             prescription = presc;
@@ -76,10 +78,11 @@ namespace VMATTBIautoPlan
             useFlash = flash;
         }
 
-        public placeBeams(bool vmat, int extra, StructureSet ss, string cid, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash, double overlapMargin)
+        public placeBeams(bool vmat, int extra, bool collision, StructureSet ss, string cid, Tuple<int, DoseValue> presc, List<string> i, int iso, int vmatIso, bool appaPlan, int[] beams, double[] coll, List<VRect<double>> jp, string linac, string energy, string calcModel, string optModel, string gpuDose, string gpuOpt, string mr, bool flash, double overlapMargin)
         {
             allVMAT = vmat;
             extraIsocenters = extra;
+            checkTTCollision = collision;
             selectedSS = ss;
             courseId = cid;
             prescription = presc;
@@ -214,6 +217,35 @@ namespace VMATTBIautoPlan
             if(useFlash) target = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "ts_flash_target");
             else target = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "ptv_body");
 
+            //Adapted PR #22 based on iromero77 suggestion (based on Stanford experience)
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            double offsetY = 0.0;
+            if (checkTTCollision)
+            {
+                //same search as used in planPrep class
+                Structure couchSurface = selectedSS.Structures.FirstOrDefault(x => x.Id.ToLower() == "couchsurface");
+                double TT = 0;
+                //check if couch is present. Warn if not found, otherwise it is the separation between the the beam isocenter position and the minimum y-position of the couch surface (in dicom coordinates)
+                if (couchSurface != null)
+                {
+                    TT = (couchSurface.MeshGeometry.Positions.Min(p => p.Y) - userOrigin.y) / 10.0;
+
+                    // if couch vertical is greater than 17.5 then assign vertical of 17.5 cm
+                    if (TT > 17.5)
+                    {
+                        confirmUI CUI = new confirmUI();
+                        CUI.message.Text = String.Format("Couch vertical is {0:0.0} cm!", TT) + Environment.NewLine + Environment.NewLine + "Override isocenter placement to achieve a couch vertical of 17.5 cm?";
+                        CUI.button1.Text = "No";
+                        CUI.button2.Text = "Yes";
+                        CUI.ShowDialog();
+                        if(CUI.confirm) offsetY = TT - 17.5;
+                    }
+                    offsetY *= 10;
+                }
+                else MessageBox.Show("Warning! No couch surface structure found! Can't perform collision check!");
+            }
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             //matchline is present and not empty
             if (selectedSS.Structures.Where(x => x.Id.ToLower() == "matchline").Any() && !selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").IsEmpty)
             {
@@ -224,7 +256,7 @@ namespace VMATTBIautoPlan
                 double isoSeparationInf = Math.Round((selectedSS.Structures.First(x => x.Id.ToLower() == "matchline").CenterPoint.z - target.MeshGeometry.Positions.Min(p => p.Z) - 380.0) / 10.0f) * 10.0f;
                 if (isoSeparationSup > 380.0 || isoSeparationInf > 380.0)
                 {
-                    var CUI = new VMATTBIautoPlan.confirmUI();
+                    confirmUI CUI = new confirmUI();
                     CUI.message.Text = "Calculated isocenter separation > 38.0 cm, which reduces the overlap between adjacent fields!" + Environment.NewLine + Environment.NewLine + "Truncate isocenter separation to 38.0 cm?!";
                     CUI.button1.Text = "No";
                     CUI.ShowDialog();
@@ -241,11 +273,12 @@ namespace VMATTBIautoPlan
                 {
                     VVector v = new VVector();
                     v.x = userOrigin.x;
-                    v.y = userOrigin.y;
+                    v.y = userOrigin.y + offsetY;
                     //6-10-2020 EAS, want to count up from matchplane to ensure distance from matchplane is fixed at 190 mm
                     v.z = matchlineZ + i * isoSeparationSup + 190.0;
                     //round z position to the nearest integer
                     v = plan.StructureSet.Image.DicomToUser(v, plan);
+                    v.y = Math.Round(v.y / 10.0f) * 10.0f;
                     v.z = Math.Round(v.z / 10.0f) * 10.0f;
                     v = plan.StructureSet.Image.UserToDicom(v, plan);
                     iso.Add(v);
@@ -260,12 +293,13 @@ namespace VMATTBIautoPlan
                 {
                     VVector v = new VVector();
                     v.x = userOrigin.x;
-                    v.y = userOrigin.y;
+                    v.y = userOrigin.y + offsetY;
                     //5-11-2020 update EAS (the first isocenter immediately inferior to the matchline is now a distance = offset away). This ensures the isocenters immediately inferior and superior to the 
                     //matchline are equidistant from the matchline
                     v.z = matchlineZ - i * isoSeparationInf - offset;
                     //round z position to the nearest integer
                     v = plan.StructureSet.Image.DicomToUser(v, plan);
+                    v.y = Math.Round(v.y / 10.0f) * 10.0f;
                     v.z = Math.Round(v.z / 10.0f) * 10.0f;
                     v = plan.StructureSet.Image.UserToDicom(v, plan);
                     iso.Add(v);
@@ -298,11 +332,12 @@ namespace VMATTBIautoPlan
                 {
                     VVector v = new VVector();
                     v.x = userOrigin.x;
-                    v.y = userOrigin.y;
+                    v.y = userOrigin.y + offsetY;
                     //5-7-2020 isocenter positions for actual isocenter separation equation described above
                     v.z = target.MeshGeometry.Positions.Max(p => p.Z) - i * isoSeparation - 190.0;
                     //round z position to the nearest integer
                     v = plan.StructureSet.Image.DicomToUser(v, plan);
+                    v.y = Math.Round(v.y / 10.0f) * 10.0f;
                     v.z = Math.Round(v.z / 10.0f) * 10.0f;
                     v = plan.StructureSet.Image.UserToDicom(v, plan);
                     iso.Add(v);
