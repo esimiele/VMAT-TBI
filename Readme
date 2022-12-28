@@ -1,4 +1,6 @@
-Updated 12/13/2022
+Updated 12/28/2022
+
+Made beta branch default. Master branch will be removed soon.
 
 Changes from 12/8/2022
 -fixed issue where multiple _VMAT TBI plans in separate courses caused the executable to ask the user multiple times to select a course whenever you add a constraint, get constraints from plan, start optimization loop, open a patient, etc.
