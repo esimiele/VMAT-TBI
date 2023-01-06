@@ -36,6 +36,7 @@ namespace VMS.TPS
             wi.Height = 735;
             wi.Width = 608;
             wi.Content = ui;
+            wi.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             wi.ShowDialog();
             wi.SizeToContent = SizeToContent.WidthAndHeight;
         }

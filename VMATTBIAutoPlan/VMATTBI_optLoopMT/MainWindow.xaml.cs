@@ -1,22 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.IO;
 using Microsoft.Win32;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 using System.Reflection;
+using VMATTBIautoPlan;
 
 // TODO: Replace the following version attributes by creating AssemblyInfo.cs. You can do this in the properties of the Visual Studio project.
 [assembly: AssemblyVersion("1.0.0.1")]
@@ -103,7 +95,7 @@ namespace VMATTBI_optLoop
         };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        VMS.TPS.Common.Model.API.Application app = VMS.TPS.Common.Model.API.Application.CreateApplication();
+        VMS.TPS.Common.Model.API.Application app = null;
         Patient pi = null;
         bool firstOptStruct = true;
         int clearOptBtnCounter = 0;
@@ -112,10 +104,13 @@ namespace VMATTBI_optLoop
         bool runOneMoreOpt = false;
         bool copyAndSavePlanItr = false;
         bool useFlash = false;
+        ExternalPlanSetup VMATTBIPlan = null;
 
         public MainWindow()
         {
             InitializeComponent();
+            try { app = VMS.TPS.Common.Model.API.Application.CreateApplication(); }
+            catch (Exception except) { MessageBox.Show(String.Format("Warning! Could not generate Aria application instance because: {0}", except.Message)); }
             if (File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\configuration\\VMAT_TBI_config.ini"))
             {
                 if (!loadConfigurationSettings(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\configuration\\VMAT_TBI_config.ini")) displayConfigurationParameters();
@@ -202,6 +197,7 @@ namespace VMATTBI_optLoop
 
         private void OpenPatient_Click(object sender, RoutedEventArgs e)
         {
+            if (app == null) return;
             //open the patient with the user-entered MRN number
             string pat_mrn = MRN.Text;
             clearEverything();
@@ -209,14 +205,15 @@ namespace VMATTBI_optLoop
             {
                 app.ClosePatient();
                 pi = app.OpenPatientById(pat_mrn);
+                if(pi == null) { MessageBox.Show(String.Format("No Patient found with MRN: {0}! Please double check entered MRN and try again!", pat_mrn)); return; }
 
-                ExternalPlanSetup plan = getPlan();
-                if (plan == null) return;
+                VMATTBIPlan = getPlan();
+                if (VMATTBIPlan == null) { MessageBox.Show(String.Format("No plans named _VMAT TBI found for patient: {0}! Close this script, and run the plugin script to generate the _VMAT TBI plan for optimization!", pat_mrn)); return; }
 
                 //populate the optimization stackpanel with the optimization parameters that were stored in the VMAT TBI plan
-                populateOptimizationTab(plan);
+                populateOptimizationTab(VMATTBIPlan);
                 //populate the prescription text boxes with the prescription stored in the VMAT TBI plan
-                populateRx(plan);
+                populateRx(VMATTBIPlan);
                 //set the default parameters for the optimization loop
                 runCoverageCk.IsChecked = runCoverageCheckOption;
                 numOptLoops.Text = defautlNumOpt;
@@ -280,13 +277,14 @@ namespace VMATTBI_optLoop
 
         private void getOptFromPlan_Click(object sender, RoutedEventArgs e)
         {
-            ExternalPlanSetup plan = getPlan();
-            if (plan == null) return;
-            else populateOptimizationTab(plan);
+            if (app == null) return;
+            if (VMATTBIPlan == null) return;
+            populateOptimizationTab(VMATTBIPlan);
         }
 
         private void startOpt_Click(object sender, RoutedEventArgs e)
         {
+            if (app == null) return;
             //start the optimization loop
             //checks
             if (opt_parameters.Children.Count == 0)
@@ -300,8 +298,7 @@ namespace VMATTBI_optLoop
                 return;
             }
             //get an instnace of the VMAT TBI plan
-            ExternalPlanSetup plan = getPlan();
-            if (plan == null) return;
+            if (VMATTBIPlan == null) return;
 
             if(!double.TryParse(targetNormTB.Text, out double planNorm))
             {
@@ -385,7 +382,7 @@ namespace VMATTBI_optLoop
 
             //start the optimization loop (all saving to the database is performed in the progressWindow class)
             pi.BeginModifications();
-            optimizationLoop optLoop = new optimizationLoop(plan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, threshold, lowDoseLimit, demo, checkSpinningManny, logFilePath, app);
+            optimizationLoop optLoop = new optimizationLoop(VMATTBIPlan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, threshold, lowDoseLimit, demo, checkSpinningManny, logFilePath, app);
         }
 
         private void ConstructPlanObjectives()
@@ -406,18 +403,19 @@ namespace VMATTBI_optLoop
 
         private void add_constraint_Click(object sender, RoutedEventArgs e)
         {
+            if (app == null) return;
             //add a blank contraint to the list
-            ExternalPlanSetup plan = getPlan();
-            if (plan != null)
+            if (VMATTBIPlan != null)
             {
-                add_opt_volumes(plan.StructureSet, new List<Tuple<string, string, double, double, int>> { Tuple.Create("--select--", "--select--", 0.0, 0.0, 0) });
+                add_opt_volumes(VMATTBIPlan.StructureSet, new List<Tuple<string, string, double, double, int>> { Tuple.Create("--select--", "--select--", 0.0, 0.0, 0) });
                 optParamScroller.ScrollToBottom();
             }
         }
 
         private ExternalPlanSetup getPlan()
         {
-            ExternalPlanSetup plan = null;
+            List<ExternalPlanSetup> plans = new List<ExternalPlanSetup> { };
+            ExternalPlanSetup thePlan = null;
             //grab an instance of the VMAT TBI plan. Return null if it isn't found
             if (pi == null) return null;
             List<Course> courses = pi.Courses.ToList();
@@ -425,10 +423,21 @@ namespace VMATTBI_optLoop
             else
             {
                 //look for plan with Id = '_VMAT TBI'
-                plan = courses.SelectMany(x => x.ExternalPlanSetups).FirstOrDefault(x => x.Id.ToLower() == "_vmat tbi");
-                if (plan == null) MessageBox.Show("No plan named _VMAT TBI!");
+                plans = courses.SelectMany(x => x.ExternalPlanSetups).Where(x => x.Id.ToLower() == "_vmat tbi").ToList();
+                if (!plans.Any()) MessageBox.Show("No plans named _VMAT TBI in any course!");
+                else if (plans.Count > 1)
+                {
+                    //do something
+                    selectItem selectCourse = new selectItem();
+                    selectCourse.title.Text = "Multiple plans named '_VMAT TBI' found!\nPlease select a course!";
+                    foreach (ExternalPlanSetup itr in plans) selectCourse.itemCombo.Items.Add(itr.Course.Id);
+                    selectCourse.itemCombo.SelectedIndex = 0;
+                    selectCourse.ShowDialog();
+                    if (selectCourse.confirm) thePlan = plans.FirstOrDefault(x => x.Course.Id == selectCourse.itemCombo.SelectedItem.ToString());
+                }
+                else thePlan = plans.First();
             }
-            return plan;
+            return thePlan;
         }
 
         private void add_opt_header()
@@ -787,6 +796,7 @@ namespace VMATTBI_optLoop
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (app == null) return;
             //be sure to close the patient before closing the application. Not doing so will result in unclosed timestamps in eclipse
             app.ClosePatient();
             app.Dispose();

@@ -138,6 +138,8 @@ namespace VMATTBIautoPlan
         string courseId = "VMAT TBI";
         //assign technique as VMAT for all fields
         bool allVMAT = false;
+        //flag to see if user wants to check for potential couch collision (based on stanford experience)
+        bool checkTTCollision = false;
         //used to keep track of how many VMAT isocenters should be inferior to matchline
         int extraIsos = 0;
         //treatment units and associated photon beam energies
@@ -234,6 +236,7 @@ namespace VMATTBIautoPlan
             configTB.Text += String.Format("Default parameters:") + System.Environment.NewLine;
             configTB.Text += String.Format("Course Id: {0}", courseId) + System.Environment.NewLine;
             configTB.Text += String.Format("Assign VMAT technique to all fields: {0}", allVMAT) + System.Environment.NewLine;
+            configTB.Text += String.Format("Check for potential couch collision: {0}", checkTTCollision) + System.Environment.NewLine;
             configTB.Text += String.Format("Include flash by default: {0}", useFlashByDefault) + System.Environment.NewLine;
             configTB.Text += String.Format("Flash type: {0}", defaultFlashType) + System.Environment.NewLine;
             configTB.Text += String.Format("Flash margin: {0} cm", defaultFlashMargin) + System.Environment.NewLine;
@@ -744,6 +747,31 @@ namespace VMATTBIautoPlan
                 else headerObj = false;
             }
 
+            ///////////////////////////////////////
+            //modified from iromero77's pull request #20
+            // If Rx >= 13.2Gy, crop Lung+5mm instead of 3mm, suggest increasing cropping margin
+            if (double.Parse(dosePerFx.Text) * double.Parse(numFx.Text) >= 1320)
+            {
+                if(structureSpareList.FirstOrDefault(x => x.Item1.ToLower() == "lungs" && x.Item2 == "Mean Dose < Rx Dose" && x.Item3 < 0.5) != null)
+                {
+                    confirmUI CUI = new confirmUI();
+                    CUI.message.Text = "Prescribed dose is greater than 13.2 Gy!" + Environment.NewLine + "I recommend increasing the cropping margin to 5 mm (to ensure lung sparing)." + Environment.NewLine + Environment.NewLine + "Increase lung crop margin to 5mm?";
+                    CUI.button1.Text = "No";
+                    CUI.button2.Text = "Yes";
+                    CUI.ShowDialog();
+                    if(CUI.confirm)
+                    {
+                        int idx = structureSpareList.FindIndex(x => x.Item1.ToLower() == "lungs" & x.Item2.ToLower().Contains("mean") & x.Item3 == 0.3);
+                        structureSpareList.RemoveAt(idx);
+                        if (idx > structureSpareList.Count) structureSpareList.Add(new Tuple<string, string, double>("Lungs", "Mean Dose < Rx Dose", 0.5));
+                        else structureSpareList.Insert(idx, new Tuple<string, string, double>("Lungs", "Mean Dose < Rx Dose", 0.5));
+                        clear_spare_list();
+                        add_sp_volumes(selectedSS, structureSpareList);
+                    }
+                }
+            }
+            ///////////////////////////////////////
+
             //create an instance of the generateTS class, passing the structure sparing list vector, the selected structure set, and if this is the scleroderma trial treatment regiment
             //The scleroderma trial contouring/margins are specific to the trial, so this trial needs to be handled separately from the generic VMAT treatment type
             VMATTBIautoPlan.generateTS generate;
@@ -1029,9 +1057,9 @@ namespace VMATTBIautoPlan
                 //convert from mm to cm
                 contourOverlapMargin *= 10.0;
                 //overloaded constructor for the placeBeams class
-                place = new placeBeams(allVMAT, extraIsos, selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash, contourOverlapMargin);
+                place = new placeBeams(allVMAT, extraIsos, checkTTCollision, selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash, contourOverlapMargin);
             }
-            else place = new placeBeams(allVMAT, extraIsos, selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash);
+            else place = new placeBeams(allVMAT, extraIsos, checkTTCollision, selectedSS, courseId, prescription, isoNames, numIsos, numVMATIsos, singleAPPAplan, numBeams, collRot, jawPos, chosenLinac, chosenEnergy, calculationModel, optimizationModel, useGPUdose, useGPUoptimization, MRrestartLevel, useFlash);
 
             VMATplan = place.generate_beams();
             if (VMATplan == null) return;
@@ -1754,6 +1782,7 @@ namespace VMATTBIautoPlan
                                         {
                                             if (parameter == "default flash margin") defaultFlashMargin = result.ToString();
                                             else if (parameter == "default target margin") defaultTargetMargin = result.ToString();
+                                            else if (parameter == "contour field overlap margin") contourFieldOverlapMargin = result.ToString(); 
                                         }
                                         else if (parameter == "documentation path")
                                         {
@@ -1791,6 +1820,7 @@ namespace VMATTBIautoPlan
                                         }
                                         else if (parameter == "course Id") courseId = value;
                                         else if (parameter == "all fields VMAT") { if (value != "") allVMAT = bool.Parse(value); }
+                                        else if (parameter == "check couch collision") { if (value != "") checkTTCollision = bool.Parse(value); }
                                         else if (parameter == "use GPU for dose calculation") useGPUdose = value;
                                         else if (parameter == "use GPU for optimization") useGPUoptimization = value;
                                         else if (parameter == "MR level restart") MRrestartLevel = value;
@@ -1800,7 +1830,6 @@ namespace VMATTBIautoPlan
                                         else if (parameter == "calculation model") { if (value != "") calculationModel = value; }
                                         else if (parameter == "optimization model") { if (value != "") optimizationModel = value; }
                                         else if (parameter == "contour field overlap") { if (value != "") contourOverlap = bool.Parse(value); }
-                                        else if (parameter == "contour field overlap margin") { if (value != "") contourFieldOverlapMargin = value; }
                                     }
                                     else if (line.Contains("add default sparing structure")) defaultSpareStruct_temp.Add(parseSparingStructure(line));
                                     else if (line.Contains("add TS")) TSstructures_temp.Add(parseTS(line));

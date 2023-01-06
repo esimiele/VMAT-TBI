@@ -179,13 +179,22 @@ namespace VMATTBIautoPlan
                     int stopSlice = (int)(((mesh.Bounds.Z + mesh.Bounds.SizeZ) - selectedSS.Image.Origin.z) / selectedSS.Image.ZRes) + 1;
                     //create an Id for the low resolution struture that will be created. The name will be '_lowRes' appended to the current structure Id
                     string newName = s.Id + "_lowRes";
-                    if (newName.Length > 16) newName = newName.Substring(0, 16);
+                    if (newName.Length > 16) newName = newName.Substring(0, 15);
+                    Structure lowRes = selectedSS.Structures.FirstOrDefault(x => x.Id == newName);
+                    if (lowRes != null)
+                    {
+                        if (selectedSS.CanRemoveStructure(lowRes)) selectedSS.RemoveStructure(lowRes);
+                        else
+                        {
+                            MessageBox.Show(String.Format("Error! Structure: {0} exists already and cannot be removed! Please delete manually and try again!", newName));
+                            return true;
+                        }
+                    }
                     //add a new structure (default resolution by default)
-                    Structure lowRes = null;
                     if (selectedSS.CanAddStructure("CONTROL", newName)) lowRes = selectedSS.AddStructure("CONTROL", newName);
                     else
                     {
-                        MessageBox.Show(String.Format("Error! Cannot add new structure: {0}!\nCorrect this issue and try again!", newName.Substring(0, 16)));
+                        MessageBox.Show(String.Format("Error! Cannot add new structure: {0}!\nCorrect this issue and try again!", newName));
                         return true;
                     }
 

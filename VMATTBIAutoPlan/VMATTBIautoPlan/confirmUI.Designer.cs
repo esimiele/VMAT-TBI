@@ -74,6 +74,7 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Name = "confirmUI";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Confirm?";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -83,7 +84,7 @@
         #endregion
 
         public System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        public System.Windows.Forms.Button button2;
         public System.Windows.Forms.TextBox message;
     }
 }
