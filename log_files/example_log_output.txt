@@ -1,0 +1,269 @@
+ Optimization parameters:
+ Run coverage check: True
+ Max number of optimizations: 3
+ Run additional optimization to lower hotspots: True
+ Copy and save each optimized plan: False
+ Plan normalization: PTV V1200cGy = 90%
+
+ I've found structures in the optimization list that have the keyword 'flash'!
+ I'm assuming you want to include flash in the optimization! Stop the loop if this is a mistake!
+
+ Primilary checks passed
+ Running coverage Check!
+ Updated optimization constraints:
+ -------------------------------------------------------------------------
+ structure Id    | constraint type  | dose (cGy) | volume (%) | priority |
+ -------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 1200.0     | 100.0      | 100      |
+ TS_PTV_FLASH    | Upper            | 1212.0     | 0.0        | 100      |
+ TS_PTV_FLASH    | Lower            | 1202.0     | 98.0       | 100      |
+ TS_jnx1         | Lower            | 1200.0     | 100.0      | 0        |
+ TS_jnx1         | Upper            | 1212.0     | 0.0        | 0        |
+ TS_jnx2         | Lower            | 1200.0     | 100.0      | 0        |
+ TS_jnx2         | Upper            | 1212.0     | 0.0        | 0        |
+ Kidneys         | Mean             | 750.0      | 0.0        | 0        |
+ Kidneys-1cm     | Mean             | 400.0      | 0.0        | 0        |
+ Lenses          | Upper            | 1140.0     | 0.0        | 0        |
+ Lungs           | Mean             | 600.0      | 0.0        | 0        |
+ Lungs-1cm       | Mean             | 300.0      | 0.0        | 0        |
+ Lungs-2cm       | Mean             | 200.0      | 0.0        | 0        |
+ Bowel           | Upper            | 1205.0     | 0.0        | 0        |
+
+ Optimization finished on coverage check! Calculating dose!
+ Elapsed time: 01:24:13
+ Dose calculated for coverage check, normalizing plan!
+ Plan normalized!
+ Additional plan infomation: 
+ Plan global Dmax = 126.6%
+ TS_PTV_FLASH Dmax = 126.6%
+ TS_PTV_FLASH Dmin = 33.7%
+ TS_PTV_FLASH V90% = 99.2%
+ TS_PTV_FLASH V110% = 25.5%
+ TS_PTV_FLASH V120% = 0.1%
+ Coverage check completed! Commencing optimization loop!
+
+ Updated optimization constraints:
+ -------------------------------------------------------------------------
+ structure Id    | constraint type  | dose (cGy) | volume (%) | priority |
+ -------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 1200.0     | 100.0      | 100      |
+ TS_PTV_FLASH    | Upper            | 1212.0     | 0.0        | 100      |
+ TS_PTV_FLASH    | Lower            | 1202.0     | 98.0       | 100      |
+ TS_jnx1         | Lower            | 1200.0     | 100.0      | 67       |
+ TS_jnx1         | Upper            | 1212.0     | 0.0        | 67       |
+ TS_jnx2         | Lower            | 1200.0     | 100.0      | 67       |
+ TS_jnx2         | Upper            | 1212.0     | 0.0        | 67       |
+ Kidneys         | Mean             | 750.0      | 0.0        | 54       |
+ Kidneys-1cm     | Mean             | 400.0      | 0.0        | 34       |
+ Lenses          | Upper            | 1140.0     | 0.0        | 34       |
+ Lungs           | Mean             | 600.0      | 0.0        | 60       |
+ Lungs-1cm       | Mean             | 300.0      | 0.0        | 54       |
+ Lungs-2cm       | Mean             | 200.0      | 0.0        | 47       |
+ Bowel           | Upper            | 1205.0     | 0.0        | 34       |
+
+ Starting optimization loop!
+ Iteration 1:
+ Elapsed time: 01:30:05
+ Optimization finished! Calculating intermediate dose!
+ Elapsed time: 02:17:40
+ Dose calculated! Continuing optimization!
+ Elapsed time: 02:23:21
+ Optimization finished! Calculating dose!
+ Elapsed time: 02:41:29
+ Dose calculated, normalizing plan!
+ Elapsed time: 02:47:15
+ Plan normalized! Evaluating plan quality and updating constraints!
+
+ Results of optimization:
+ ---------------------------------------------------------------------------------------------------------
+ structure Id    | constraint type  | dose diff^2 (cGy^2)  | current priority | cost         | cost (%)  |
+ ---------------------------------------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 639691.9             | 100              | 63969187.3   | 59.0      |
+ TS_PTV_FLASH    | Upper            | 61051.1              | 100              | 6105106.6    | 5.6       |
+ TS_PTV_FLASH    | Lower            | 5965.6               | 100              | 596562.7     | 0.6       |
+ TS_jnx1         | Lower            | 170605.7             | 67               | 11430582.0   | 10.5      |
+ TS_jnx1         | Upper            | 42079.5              | 67               | 2819325.6    | 2.6       |
+ TS_jnx2         | Lower            | 150657.5             | 67               | 10094050.8   | 9.3       |
+ TS_jnx2         | Upper            | 61051.1              | 67               | 4090421.4    | 3.8       |
+ Kidneys         | Mean             | 6430.5               | 54               | 347246.9     | 0.3       |
+ Kidneys-1cm     | Mean             | 49328.4              | 34               | 1677165.4    | 1.5       |
+ Lenses          | Upper            | 4326.8               | 34               | 147109.7     | 0.1       |
+ Lungs           | Mean             | 12627.6              | 60               | 757658.6     | 0.7       |
+ Lungs-1cm       | Mean             | 53935.9              | 54               | 2912539.8    | 2.7       |
+ Lungs-2cm       | Mean             | 47771.7              | 47               | 2245268.4    | 2.1       |
+ Bowel           | Upper            | 35543.7              | 34               | 1208485.1    | 1.1       |
+
+ Additional plan infomation: 
+ Plan global Dmax = 121.6%
+ TS_PTV_FLASH Dmax = 121.6%
+ TS_PTV_FLASH Dmin = 33.3%
+ TS_PTV_FLASH V90% = 98.9%
+ TS_PTV_FLASH V110% = 4.0%
+ TS_PTV_FLASH V120% = 0.0%
+
+ Updated optimization constraints:
+ -------------------------------------------------------------------------
+ structure Id    | constraint type  | dose (cGy) | volume (%) | priority |
+ -------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 1200.0     | 100.0      | 106      |
+ TS_PTV_FLASH    | Upper            | 1212.0     | 0.0        | 101      |
+ TS_PTV_FLASH    | Lower            | 1202.0     | 98.0       | 101      |
+ TS_jnx1         | Lower            | 1200.0     | 100.0      | 78       |
+ TS_jnx1         | Upper            | 1212.0     | 0.0        | 70       |
+ TS_jnx2         | Lower            | 1200.0     | 100.0      | 77       |
+ TS_jnx2         | Upper            | 1212.0     | 0.0        | 71       |
+ Kidneys         | Mean             | 750.0      | 0.0        | 55       |
+ Kidneys-1cm     | Mean             | 400.0      | 0.0        | 36       |
+ Lenses          | Upper            | 1140.0     | 0.0        | 35       |
+ Lungs           | Mean             | 600.0      | 0.0        | 61       |
+ Lungs-1cm       | Mean             | 300.0      | 0.0        | 57       |
+ Lungs-2cm       | Mean             | 200.0      | 0.0        | 50       |
+ Bowel           | Upper            | 1205.0     | 0.0        | 36       |
+ TS_cooler110    | Upper            | 1260.0     | 0.0        | 80       |
+ TS_heater90     | Lower            | 1200.0     | 100.0      | 60       |
+
+ Iteration 2:
+ Elapsed time: 02:47:48
+ Optimization finished! Calculating intermediate dose!
+ Elapsed time: 03:37:02
+ Dose calculated! Continuing optimization!
+ Elapsed time: 03:42:49
+ Optimization finished! Calculating dose!
+ Elapsed time: 04:00:15
+ Dose calculated, normalizing plan!
+ Elapsed time: 04:06:04
+ Plan normalized! Evaluating plan quality and updating constraints!
+
+ Results of optimization:
+ ---------------------------------------------------------------------------------------------------------
+ structure Id    | constraint type  | dose diff^2 (cGy^2)  | current priority | cost         | cost (%)  |
+ ---------------------------------------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 635910.9             | 106              | 67406558.1   | 53.3      |
+ TS_PTV_FLASH    | Upper            | 60369.8              | 101              | 6097347.7    | 4.8       |
+ TS_PTV_FLASH    | Lower            | 5137.1               | 101              | 518845.7     | 0.4       |
+ TS_jnx1         | Lower            | 151309.7             | 78               | 11802153.4   | 9.3       |
+ TS_jnx1         | Upper            | 42859.9              | 70               | 3000190.5    | 2.4       |
+ TS_jnx2         | Lower            | 197664.5             | 77               | 15220166.0   | 12.0      |
+ TS_jnx2         | Upper            | 60369.8              | 71               | 4286254.3    | 3.4       |
+ Kidneys         | Mean             | 8430.4               | 55               | 463670.4     | 0.4       |
+ Kidneys-1cm     | Mean             | 51718.7              | 36               | 1861873.6    | 1.5       |
+ Lenses          | Upper            | 6610.7               | 35               | 231374.0     | 0.2       |
+ Lungs           | Mean             | 18028.4              | 61               | 1099731.8    | 0.9       |
+ Lungs-1cm       | Mean             | 60080.1              | 57               | 3424565.0    | 2.7       |
+ Lungs-2cm       | Mean             | 48912.7              | 50               | 2445636.1    | 1.9       |
+ Bowel           | Upper            | 35336.3              | 36               | 1272107.8    | 1.0       |
+ TS_cooler110    | Upper            | 39086.3              | 80               | 3126906.2    | 2.5       |
+ TS_heater90     | Lower            | 71340.4              | 60               | 4280423.1    | 3.4       |
+
+ Additional plan infomation: 
+ Plan global Dmax = 121.5%
+ TS_PTV_FLASH Dmax = 121.5%
+ TS_PTV_FLASH Dmin = 33.5%
+ TS_PTV_FLASH V90% = 99.0%
+ TS_PTV_FLASH V110% = 4.4%
+ TS_PTV_FLASH V120% = 0.0%
+
+ Updated optimization constraints:
+ -------------------------------------------------------------------------
+ structure Id    | constraint type  | dose (cGy) | volume (%) | priority |
+ -------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 1200.0     | 100.0      | 112      |
+ TS_PTV_FLASH    | Upper            | 1212.0     | 0.0        | 102      |
+ TS_PTV_FLASH    | Lower            | 1202.0     | 98.0       | 102      |
+ TS_jnx1         | Lower            | 1200.0     | 100.0      | 88       |
+ TS_jnx1         | Upper            | 1212.0     | 0.0        | 73       |
+ TS_jnx2         | Lower            | 1200.0     | 100.0      | 90       |
+ TS_jnx2         | Upper            | 1212.0     | 0.0        | 75       |
+ Kidneys         | Mean             | 750.0      | 0.0        | 56       |
+ Kidneys-1cm     | Mean             | 400.0      | 0.0        | 38       |
+ Lenses          | Upper            | 1140.0     | 0.0        | 36       |
+ Lungs           | Mean             | 600.0      | 0.0        | 62       |
+ Lungs-1cm       | Mean             | 300.0      | 0.0        | 60       |
+ Lungs-2cm       | Mean             | 200.0      | 0.0        | 52       |
+ Bowel           | Upper            | 1205.0     | 0.0        | 38       |
+ TS_cooler110    | Upper            | 1260.0     | 0.0        | 80       |
+ TS_heater90     | Lower            | 1200.0     | 100.0      | 60       |
+
+ Iteration 3:
+ Elapsed time: 04:06:38
+ Optimization finished! Calculating intermediate dose!
+ Elapsed time: 04:54:23
+ Dose calculated! Continuing optimization!
+ Elapsed time: 05:00:15
+ Optimization finished! Calculating dose!
+ Elapsed time: 05:17:43
+ Dose calculated, normalizing plan!
+ Elapsed time: 05:23:18
+ Plan normalized! Evaluating plan quality and updating constraints!
+
+ Results of optimization:
+ ---------------------------------------------------------------------------------------------------------
+ structure Id    | constraint type  | dose diff^2 (cGy^2)  | current priority | cost         | cost (%)  |
+ ---------------------------------------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 588056.3             | 112              | 65862303.8   | 48.1      |
+ TS_PTV_FLASH    | Upper            | 93411.9              | 102              | 9528017.8    | 7.0       |
+ TS_PTV_FLASH    | Lower            | 5450.5               | 102              | 555954.2     | 0.4       |
+ TS_jnx1         | Lower            | 144241.1             | 88               | 12693217.0   | 9.3       |
+ TS_jnx1         | Upper            | 43279.0              | 73               | 3159369.0    | 2.3       |
+ TS_jnx2         | Lower            | 191824.6             | 90               | 17264215.5   | 12.6      |
+ TS_jnx2         | Upper            | 93411.9              | 75               | 7005895.4    | 5.1       |
+ Kidneys         | Mean             | 7563.9               | 56               | 423578.1     | 0.3       |
+ Kidneys-1cm     | Mean             | 46592.4              | 38               | 1770511.8    | 1.3       |
+ Lenses          | Upper            | 10303.2              | 36               | 370916.9     | 0.3       |
+ Lungs           | Mean             | 19547.6              | 62               | 1211950.7    | 0.9       |
+ Lungs-1cm       | Mean             | 62244.1              | 60               | 3734648.1    | 2.7       |
+ Lungs-2cm       | Mean             | 51785.5              | 52               | 2692845.6    | 2.0       |
+ Bowel           | Upper            | 32872.5              | 38               | 1249154.2    | 0.9       |
+ TS_cooler110    | Upper            | 66375.1              | 80               | 5310008.5    | 3.9       |
+ TS_heater90     | Lower            | 68594.4              | 60               | 4115662.2    | 3.0       |
+
+ Additional plan infomation: 
+ Plan global Dmax = 126.5%
+ TS_PTV_FLASH Dmax = 126.5%
+ TS_PTV_FLASH Dmin = 36.1%
+ TS_PTV_FLASH V90% = 99.0%
+ TS_PTV_FLASH V110% = 6.3%
+ TS_PTV_FLASH V120% = 0.0%
+
+ Updated optimization constraints:
+ -------------------------------------------------------------------------
+ structure Id    | constraint type  | dose (cGy) | volume (%) | priority |
+ -------------------------------------------------------------------------
+ TS_PTV_FLASH    | Lower            | 1200.0     | 100.0      | 117      |
+ TS_PTV_FLASH    | Upper            | 1212.0     | 0.0        | 103      |
+ TS_PTV_FLASH    | Lower            | 1202.0     | 98.0       | 103      |
+ TS_jnx1         | Lower            | 1200.0     | 100.0      | 98       |
+ TS_jnx1         | Upper            | 1212.0     | 0.0        | 76       |
+ TS_jnx2         | Lower            | 1200.0     | 100.0      | 103      |
+ TS_jnx2         | Upper            | 1212.0     | 0.0        | 81       |
+ Kidneys         | Mean             | 750.0      | 0.0        | 57       |
+ Kidneys-1cm     | Mean             | 400.0      | 0.0        | 40       |
+ Lenses          | Upper            | 1140.0     | 0.0        | 37       |
+ Lungs           | Mean             | 600.0      | 0.0        | 63       |
+ Lungs-1cm       | Mean             | 300.0      | 0.0        | 63       |
+ Lungs-2cm       | Mean             | 200.0      | 0.0        | 54       |
+ Bowel           | Upper            | 1205.0     | 0.0        | 39       |
+ TS_cooler110    | Upper            | 1212.0     | 0.0        | 117      |
+ TS_heater90     | Lower            | 1200.0     | 100.0      | 60       |
+
+ Running one final optimization starting at MR3 to try and reduce global plan hotspots!
+ Elapsed time: 05:23:52
+ Optimization finished! Calculating dose!
+ Elapsed time: 05:40:50
+ Dose calculated, normalizing plan!
+ Elapsed time: 05:46:31
+
+ Final plan infomation: 
+ Plan global Dmax = 124.1%
+ TS_PTV_FLASH Dmax = 124.1%
+ TS_PTV_FLASH Dmin = 36.6%
+ TS_PTV_FLASH V90% = 99.0%
+ TS_PTV_FLASH V110% = 3.8%
+ TS_PTV_FLASH V120% = 0.0%
+
+ Removing flash, recalculating dose, and renormalizing to TS_PTV_VMAT!
+ Elapsed time: 05:46:32
+ Dose calculated, normalizing plan!
+ Elapsed time: 15:56:53
+
+ Finished!
