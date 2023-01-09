@@ -37,7 +37,7 @@ namespace VMATTBIautoPlan
         double[] CW = { 181.0, 179.0 };
         double[] CCW = {179.0, 181.0 };
         ExternalBeamMachineParameters ebmpArc;
-        ExternalBeamMachineParameters ebmpArc6X;
+        //ExternalBeamMachineParameters ebmpArc6X;
         ExternalBeamMachineParameters ebmpStatic;
         List<VRect<double>> jawPos;
         private string calculationModel = "";
@@ -66,7 +66,7 @@ namespace VMATTBIautoPlan
             collRot = coll;
             jawPos = new List<VRect<double>>(jp);
             ebmpArc = new ExternalBeamMachineParameters(linac, energy, 600, "ARC", null);
-            if(allVMAT) ebmpArc6X = new ExternalBeamMachineParameters(linac, "6X", 600, "ARC", null);
+            //if(allVMAT) ebmpArc6X = new ExternalBeamMachineParameters(linac, "6X", 600, "ARC", null);
             //AP/PA beams always use 6X
             ebmpStatic = new ExternalBeamMachineParameters(linac, "6X", 600, "STATIC", null);
             //copy the calculation model
@@ -94,7 +94,7 @@ namespace VMATTBIautoPlan
             collRot = coll;
             jawPos = new List<VRect<double>>(jp);
             ebmpArc = new ExternalBeamMachineParameters(linac, energy, 600, "ARC", null);
-            if(allVMAT) ebmpArc6X = new ExternalBeamMachineParameters(linac, "6X", 600, "ARC", null);
+            //if(allVMAT) ebmpArc6X = new ExternalBeamMachineParameters(linac, "6X", 600, "ARC", null);
             //AP/PA beams always use 6X
             ebmpStatic = new ExternalBeamMachineParameters(linac, "6X", 600, "STATIC", null);
             //copy the calculation model
@@ -460,15 +460,17 @@ namespace VMATTBIautoPlan
                     //all even beams (e.g., 2, 4, etc.) will be CCW and all odd beams will be CW
                     if (count % 2 == 0)
                     {
-                        if(allVMAT && i >= numVMATIsos - extraIsocenters) b = plan.AddArcBeam(ebmpArc6X, jp, coll, CCW[0], CCW[1], GantryDirection.CounterClockwise, 0, isoLocations.ElementAt(i));
-                        else b = plan.AddArcBeam(ebmpArc, jp, coll, CCW[0], CCW[1], GantryDirection.CounterClockwise, 0, isoLocations.ElementAt(i));
+                        //if(allVMAT && i >= numVMATIsos - extraIsocenters) b = plan.AddArcBeam(ebmpArc6X, jp, coll, CCW[0], CCW[1], GantryDirection.CounterClockwise, 0, isoLocations.ElementAt(i));
+                        //else b = plan.AddArcBeam(ebmpArc, jp, coll, CCW[0], CCW[1], GantryDirection.CounterClockwise, 0, isoLocations.ElementAt(i));
+                        b = plan.AddArcBeam(ebmpArc, jp, coll, CCW[0], CCW[1], GantryDirection.CounterClockwise, 0, isoLocations.ElementAt(i));
                         if (j >= 2) beamName += String.Format("CCW {0}{1}", isoNames.ElementAt(i), 90);
                         else beamName += String.Format("CCW {0}{1}", isoNames.ElementAt(i), "");
                     }
                     else
                     {
-                        if (allVMAT && i >= numVMATIsos - extraIsocenters) b = plan.AddArcBeam(ebmpArc6X, jp, coll, CW[0], CW[1], GantryDirection.Clockwise, 0, isoLocations.ElementAt(i));
-                        else b = plan.AddArcBeam(ebmpArc, jp, coll, CW[0], CW[1], GantryDirection.Clockwise, 0, isoLocations.ElementAt(i));
+                        //if (allVMAT && i >= numVMATIsos - extraIsocenters) b = plan.AddArcBeam(ebmpArc6X, jp, coll, CW[0], CW[1], GantryDirection.Clockwise, 0, isoLocations.ElementAt(i));
+                        //else b = plan.AddArcBeam(ebmpArc, jp, coll, CW[0], CW[1], GantryDirection.Clockwise, 0, isoLocations.ElementAt(i));
+                        b = plan.AddArcBeam(ebmpArc, jp, coll, CW[0], CW[1], GantryDirection.Clockwise, 0, isoLocations.ElementAt(i));
                         if (j >= 2) beamName += String.Format("CW {0}{1}", isoNames.ElementAt(i), 90);
                         else beamName += String.Format("CW {0}{1}", isoNames.ElementAt(i), "");
                     }

@@ -103,4 +103,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>if NOT EXIST "$(ProjectDir)$(OutDir)\configuration\" (
+mkdir "$(ProjectDir)$(OutDir)\configuration\"
+)</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(ProjectDir)\..\configuration\*" "$(ProjectDir)$(OutDir)\configuration"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
