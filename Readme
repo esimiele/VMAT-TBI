@@ -1,4 +1,8 @@
-Updated 1/8/2023
+Updated 1/9/2023
+
+Changes from 1/8/2023
+-addressed issue #25
+-adjusted pre and post build events for both project files
 
 Changes from 12/28/2022
 -copied extra files from master branch to beta branch (example patients, excel worksheet, documentation, etc)
