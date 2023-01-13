@@ -54,6 +54,7 @@ namespace VMATTBI_optLoop
         //lower dose limit
         double lowDoseLimit = 0.1;
 
+        List<string> supportStructureIds = new List<string>{};
 
         //changed PTV_BODY to targetId for the cases where the patient has an appa plan and needs to ts_PTV_VMAT or ts_PTV_FLASH (if flash was used) structure
         public List<Tuple<string, string, double, double, DoseValuePresentation>> planObjSclero = new List<Tuple<string, string, double, double, DoseValuePresentation>>
@@ -145,7 +146,17 @@ namespace VMATTBI_optLoop
             configTB.Text += String.Format("Plan normalization: {0}% (i.e., PTV V100% = {0}%)", defaultPlanNorm) + System.Environment.NewLine;
             configTB.Text += String.Format("Decision threshold: {0}", threshold) + System.Environment.NewLine;
             configTB.Text += String.Format("Relative lower dose limit: {0}", lowDoseLimit) + System.Environment.NewLine + System.Environment.NewLine;
-            
+
+            configTB.Text += "---------------------------------------------------------------------------" + System.Environment.NewLine;
+            configTB.Text += String.Format("Added support structure Ids:") + System.Environment.NewLine;
+            if (supportStructureIds.Any())
+            {
+                configTB.Text += String.Format(" {0, -15} |", "structure Id") + System.Environment.NewLine;
+                foreach (string itr in supportStructureIds) configTB.Text += String.Format(" {0}", itr) + Environment.NewLine;
+            }
+            else configTB.Text += " None added!" + Environment.NewLine;
+            configTB.Text += System.Environment.NewLine;
+
             configTB.Text += "---------------------------------------------------------------------------" + System.Environment.NewLine;
             configTB.Text += String.Format("Scleroderma trial plan objectives:") + System.Environment.NewLine;
             configTB.Text += String.Format(" {0, -15} | {1, -16} | {2, -10} | {3, -10} | {4, -9} |", "structure Id", "constraint type", "dose", "volume (%)", "dose type") + System.Environment.NewLine;
@@ -382,7 +393,7 @@ namespace VMATTBI_optLoop
 
             //start the optimization loop (all saving to the database is performed in the progressWindow class)
             pi.BeginModifications();
-            optimizationLoop optLoop = new optimizationLoop(VMATTBIPlan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, threshold, lowDoseLimit, demo, checkSpinningManny, logFilePath, app);
+            optimizationLoop optLoop = new optimizationLoop(VMATTBIPlan, optParametersList, planObj, requestedTSstructures, planNorm, numOptimizations, runCoverageCheck, runOneMoreOpt, copyAndSavePlanItr, useFlash, threshold, lowDoseLimit, demo, supportStructureIds, checkSpinningManny, logFilePath, app);
         }
 
         private void ConstructPlanObjectives()
@@ -614,6 +625,7 @@ namespace VMATTBI_optLoop
                 using (StreamReader reader = new StreamReader(configFile))
                 {
                     string line;
+                    List<string> supportStructureIds_temp = new List<string>{};
                     List<Tuple<string, string, double, double, DoseValuePresentation>> planObjSclero_temp = new List<Tuple<string, string, double, double, DoseValuePresentation>> { };
                     List<Tuple<string, string, double, double, DoseValuePresentation>> planObjGeneral_temp = new List<Tuple<string, string, double, double, DoseValuePresentation>> { };
                     List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> requestedTSstructures_temp = new List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> { };
@@ -656,6 +668,7 @@ namespace VMATTBI_optLoop
                                             else if (parameter == "run additional optimization") { if (value != "") runAdditionalOptOption = bool.Parse(value); }
                                             else if (parameter == "copy and save each plan") { if (value != "") copyAndSaveOption = bool.Parse(value); }
                                         }
+                                        else if (line.Contains("add support structure Id")) supportStructureIds_temp.Add(parseSupportStructureId(line));
                                         else if (line.Contains("add scleroderma plan objective")) planObjSclero_temp.Add(parsePlanObjective(line));
                                         else if (line.Contains("add plan objective")) planObjGeneral_temp.Add(parsePlanObjective(line));
                                         else if (line.Contains("add TS structure")) requestedTSstructures_temp.Add(parseTSstructure(line));
@@ -664,6 +677,7 @@ namespace VMATTBI_optLoop
                             }
                         }
                     }
+                    if (supportStructureIds_temp.Any()) supportStructureIds = supportStructureIds_temp;
                     if (planObjSclero_temp.Any()) planObjSclero = planObjSclero_temp;
                     if (planObjGeneral_temp.Any()) planObjGeneral = planObjGeneral_temp;
                     if (requestedTSstructures_temp.Any()) requestedTSstructures = requestedTSstructures_temp;
@@ -671,6 +685,14 @@ namespace VMATTBI_optLoop
                 return false;
             }
             catch (Exception e) { MessageBox.Show(String.Format("Error could not load configuration file because: {0}\n\nAssuming default parameters", e.Message)); return true; }
+        }
+
+        private string parseSupportStructureId(string line)
+        {
+            string supportID = "";
+            line = cropLine(line, "{");
+            supportID = line.Substring(0,line.IndexOf("}"));
+            return supportID;
         }
 
         private Tuple<string, string, double, double, DoseValuePresentation> parsePlanObjective(string line)

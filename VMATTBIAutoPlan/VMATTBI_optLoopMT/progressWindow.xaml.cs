@@ -148,7 +148,7 @@ namespace VMATTBI_optLoop
                 //These commands in this class are used to update the progress window UI (under control of the daughter thread)
                 Dispatcher.BeginInvoke((Action)(() => { abortStatus.Text = "Running"; }));
                 //run preliminary checks on the plan before starting the optimization loop. The code for these checks is in the optimizationLoop class
-                if (op.preliminaryChecks(d.plan, d.checkSpinningManny))
+                if (op.preliminaryChecks(d.plan, d.checkSpinningManny, d.supportStructureIds))
                 {
                     //preliminary checks have failed. Set the abort status and kill the optimization loop
                     Dispatcher.BeginInvoke((Action)(() => { abortStatus.Text = "Failed!"; }));

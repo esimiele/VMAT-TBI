@@ -57,6 +57,9 @@
   <PropertyGroup>
     <StartupObject>VMATTBI_optLoopMT.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -164,5 +167,9 @@
     <PreBuildEvent>if NOT EXIST "$(ProjectDir)$(OutDir)\configuration\" (
 mkdir "$(ProjectDir)$(OutDir)\configuration\"
 )</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>if NOT EXIST "$(ProjectDir)$(OutDir)\configuration" (
+mkdir "$(ProjectDir)$(OutDir)\configuration" )</PreBuildEvent>
   </PropertyGroup>
 </Project>
