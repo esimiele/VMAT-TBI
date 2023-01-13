@@ -222,17 +222,19 @@ namespace VMATTBI_optLoop
                 return true;
             }
 
-            //grab all couch structures including couch surface, rails, etc. Also grab the matchline and spinning manny couch (might not be present depending on the size of the patient)
-            //IEnumerable<Structure> couch = plan.StructureSet.Structures.Where(x => x.Id.ToLower().Contains("couch"));
-            //IEnumerable<Structure> rails = plan.StructureSet.Structures.Where(x => x.Id.ToLower().Contains("rail"));
+            //grab all couch structures (Structures who ids match those added in the configuration file) Also grab the matchline and spinning manny couch (might not be present depending on the size of the patient)
             List<Structure> supports = new List<Structure>{};
-            foreach(string itr in supportStructureIds) if(plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower().Contains(itr.ToLower()) != null)) supports.Add(plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower().Contains(itr.ToLower()));
+            foreach (string itr in supportStructureIds)
+            {
+                Structure supportMatch = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower().Contains(itr.ToLower()));
+                if (supportMatch != null) supports.Add(supportMatch);
+            }
             Structure matchline = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == "matchline");
             Structure spinningManny = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == "spinmannysurface");
             if(spinningManny == null) spinningManny = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == "couchmannysurfac");
 
             //check to see if the couch and rail structures are present in the structure set. If not, let the user know as an FYI. At this point, the user can choose to stop the optimization loop and add the couch structures
-            if (!supports.Any())
+            if (!supports.Any() && supportStructureIds.Any())
             {
                 confirmUI CUI = new VMATTBI_optLoop.confirmUI();
                 CUI.message.Text = String.Format("I didn't found any support structures in the structure set!") + Environment.NewLine + Environment.NewLine + "Continue?!";
@@ -255,7 +257,6 @@ namespace VMATTBI_optLoop
 
             //now check if the couch and spinning manny structures are present on the first and last slices of the CT image
             bool checkSupportStruct = false;
-            //if ((couch.Any() && couch.Where(x => !x.IsEmpty).Any()) && (couch.Where(x => x.GetContoursOnImagePlane(0).Any()).Any() || couch.Where(x => x.GetContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1).Any()).Any())) checkSupportStruct = true;
             if ((supports.Any() && supports.Where(x => !x.IsEmpty).Any()) && (supports.Where(x => x.GetContoursOnImagePlane(0).Any()).Any() || supports.Where(x => x.GetContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1).Any()).Any())) checkSupportStruct = true;
             if (checkSpinningManny && !checkSupportStruct && (spinningManny != null && !spinningManny.IsEmpty) && (spinningManny.GetContoursOnImagePlane(0).Any() || spinningManny.GetContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1).Any())) checkSupportStruct = true;
             if (checkSupportStruct)

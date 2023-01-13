@@ -57,6 +57,9 @@
   <PropertyGroup>
     <StartupObject>VMATTBI_optLoopMT.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -159,5 +162,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)\..\configuration\*" "$(ProjectDir)$(OutDir)\configuration\"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>if NOT EXIST "$(ProjectDir)$(OutDir)\configuration" (
+mkdir "$(ProjectDir)$(OutDir)\configuration" )</PreBuildEvent>
   </PropertyGroup>
 </Project>

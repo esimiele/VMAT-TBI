@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VMATTBI_optLoop"
         mc:Ignorable="d"
-        HorizontalAlignment="Center" Height="605" Width="815" Background="DarkGray" Closing="Window_Closing">
+        HorizontalAlignment="Center" Height="605" Width="815" Background="DarkGray" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid>
         <Label Content="Progress of Optimization Loop" FontSize="20" FontWeight="Bold" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="5"></Label>
         <ScrollViewer x:Name ="scroller" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="795" Height="490" Margin="0,0,0,35" BorderBrush="Black">

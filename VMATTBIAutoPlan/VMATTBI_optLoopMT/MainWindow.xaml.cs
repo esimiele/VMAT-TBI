@@ -146,7 +146,17 @@ namespace VMATTBI_optLoop
             configTB.Text += String.Format("Plan normalization: {0}% (i.e., PTV V100% = {0}%)", defaultPlanNorm) + System.Environment.NewLine;
             configTB.Text += String.Format("Decision threshold: {0}", threshold) + System.Environment.NewLine;
             configTB.Text += String.Format("Relative lower dose limit: {0}", lowDoseLimit) + System.Environment.NewLine + System.Environment.NewLine;
-            
+
+            configTB.Text += "---------------------------------------------------------------------------" + System.Environment.NewLine;
+            configTB.Text += String.Format("Added support structure Ids:") + System.Environment.NewLine;
+            if (supportStructureIds.Any())
+            {
+                configTB.Text += String.Format(" {0, -15} |", "structure Id") + System.Environment.NewLine;
+                foreach (string itr in supportStructureIds) configTB.Text += String.Format(" {0}", itr) + Environment.NewLine;
+            }
+            else configTB.Text += " None added!" + Environment.NewLine;
+            configTB.Text += System.Environment.NewLine;
+
             configTB.Text += "---------------------------------------------------------------------------" + System.Environment.NewLine;
             configTB.Text += String.Format("Scleroderma trial plan objectives:") + System.Environment.NewLine;
             configTB.Text += String.Format(" {0, -15} | {1, -16} | {2, -10} | {3, -10} | {4, -9} |", "structure Id", "constraint type", "dose", "volume (%)", "dose type") + System.Environment.NewLine;
