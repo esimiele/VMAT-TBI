@@ -2,7 +2,7 @@ Updated 1/13/2023
 
 Changes from 1/9/2023
 -introduced fix for couch issue #23
--can add key strings in configuration file for script to identify support structures (not spinning manny!)
+-can add key strings identifiers in configuration file for script to identify support structures (not spinning manny!)
 
 Changes from 1/8/2023
 -addressed issue #25
