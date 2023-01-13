@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:VMATTBI_optLoop"
         mc:Ignorable="d"
         Height="740" Width="615" Background="DarkGray"
-        Closing="Window_Closing">
+        WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid>
         <Grid Height="235" Width="600" VerticalAlignment="Top" Margin="0,-1,-8,0">
             <Label Content="VMAT TBI optimization loop script" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="5"></Label>
