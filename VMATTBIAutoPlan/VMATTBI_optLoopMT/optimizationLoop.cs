@@ -25,6 +25,7 @@ namespace VMATTBI_optLoop
         public bool oneMoreOpt;
         public bool copyAndSavePlanItr;
         public bool useFlash;
+        public List<string> supportStructureIds;
         public List<Tuple<string, string, double, double, int>> optParams;
         public List<Tuple<string, string, double, double, DoseValuePresentation>> planObj;
         public List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> requestedTSstructures;
@@ -35,7 +36,7 @@ namespace VMATTBI_optLoop
         public string logFilePath;
         //simple method to automatically assign/initialize the above data members
         public void construct(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, List<Tuple<string,string,double,double,DoseValuePresentation>> objectives, List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> RTS,
-                              double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, double thres, double lowDose, bool demo, bool spinManny, string logPath, VMS.TPS.Common.Model.API.Application a)
+                              double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, double thres, double lowDose, bool demo, List<string> supportIds, bool spinManny, string logPath, VMS.TPS.Common.Model.API.Application a)
         {
             optParams = new List<Tuple<string, string, double, double, int>> { };
             optParams = param;
@@ -48,6 +49,8 @@ namespace VMATTBI_optLoop
             logFilePath = logPath;
             //run the optimization loop as a demo
             isDemo = demo;
+            //assign support structure ids
+            supportStructureIds = supportIds;
             //check for spinning manny couchtop
             checkSpinningManny = spinManny;
             //what percentage of the target volume should recieve the prescription dose
@@ -127,11 +130,11 @@ namespace VMATTBI_optLoop
         }
 
         public optimizationLoop(ExternalPlanSetup p, List<Tuple<string, string, double, double, int>> param, List<Tuple<string, string, double, double, DoseValuePresentation>> objectives, List<Tuple<string, double, double, double, int, List<Tuple<string, double, string, double>>>> RTS,
-                                double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, double thres, double lowDose, bool demo, bool checkSpinningManny, string log, VMS.TPS.Common.Model.API.Application a)
+                                double targetNorm, int numOpt, bool coverMe, bool unoMas, bool copyAndSave, bool flash, double thres, double lowDose, bool demo, List<string> supportIds, bool checkSpinningManny, string log, VMS.TPS.Common.Model.API.Application a)
         {
             //create a new instance of the structure dataContainer and assign the optimization loop parameters entered by the user to the various data members
             dataContainer d = new dataContainer();
-            d.construct(p, param, objectives, RTS, targetNorm, numOpt, coverMe, unoMas, copyAndSave, flash, thres, lowDose, demo, checkSpinningManny, log, a);
+            d.construct(p, param, objectives, RTS, targetNorm, numOpt, coverMe, unoMas, copyAndSave, flash, thres, lowDose, demo, supportIds, checkSpinningManny, log, a);
 
             //create a new thread and pass it the data structure created above (it will copy this information to its local thread memory)
             ESAPIworker slave = new ESAPIworker(d);
@@ -162,7 +165,7 @@ namespace VMATTBI_optLoop
             t.Start();
         }
 
-        public bool preliminaryChecks(ExternalPlanSetup plan, bool checkSpinningManny)
+        public bool preliminaryChecks(ExternalPlanSetup plan, bool checkSpinningManny, List<string> supportStructureIds)
         {
             //check if the user assigned the imaging device Id. If not, the optimization will crash with no error
             if (plan.StructureSet.Image.Series.ImagingDeviceId == "")
@@ -220,17 +223,19 @@ namespace VMATTBI_optLoop
             }
 
             //grab all couch structures including couch surface, rails, etc. Also grab the matchline and spinning manny couch (might not be present depending on the size of the patient)
-            IEnumerable<Structure> couch = plan.StructureSet.Structures.Where(x => x.Id.ToLower().Contains("couch"));
-            IEnumerable<Structure> rails = plan.StructureSet.Structures.Where(x => x.Id.ToLower().Contains("rail"));
+            //IEnumerable<Structure> couch = plan.StructureSet.Structures.Where(x => x.Id.ToLower().Contains("couch"));
+            //IEnumerable<Structure> rails = plan.StructureSet.Structures.Where(x => x.Id.ToLower().Contains("rail"));
+            List<Structure> supports = new List<Structure>{};
+            foreach(string itr in supportStructureIds) if(plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower().Contains(itr.ToLower()) != null)) supports.Add(plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower().Contains(itr.ToLower()));
             Structure matchline = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == "matchline");
             Structure spinningManny = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == "spinmannysurface");
             if(spinningManny == null) spinningManny = plan.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower() == "couchmannysurfac");
 
             //check to see if the couch and rail structures are present in the structure set. If not, let the user know as an FYI. At this point, the user can choose to stop the optimization loop and add the couch structures
-            if (!couch.Any() || !rails.Any())
+            if (!supports.Any())
             {
                 confirmUI CUI = new VMATTBI_optLoop.confirmUI();
-                CUI.message.Text = String.Format("I didn't found any couch structures in the structure set!") + Environment.NewLine + Environment.NewLine + "Continue?!";
+                CUI.message.Text = String.Format("I didn't found any support structures in the structure set!") + Environment.NewLine + Environment.NewLine + "Continue?!";
                 CUI.ShowDialog();
                 if (!CUI.confirm) return true;
             }
@@ -250,7 +255,8 @@ namespace VMATTBI_optLoop
 
             //now check if the couch and spinning manny structures are present on the first and last slices of the CT image
             bool checkSupportStruct = false;
-            if ((couch.Any() && couch.Where(x => !x.IsEmpty).Any()) && (couch.Where(x => x.GetContoursOnImagePlane(0).Any()).Any() || couch.Where(x => x.GetContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1).Any()).Any())) checkSupportStruct = true;
+            //if ((couch.Any() && couch.Where(x => !x.IsEmpty).Any()) && (couch.Where(x => x.GetContoursOnImagePlane(0).Any()).Any() || couch.Where(x => x.GetContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1).Any()).Any())) checkSupportStruct = true;
+            if ((supports.Any() && supports.Where(x => !x.IsEmpty).Any()) && (supports.Where(x => x.GetContoursOnImagePlane(0).Any()).Any() || supports.Where(x => x.GetContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1).Any()).Any())) checkSupportStruct = true;
             if (checkSpinningManny && !checkSupportStruct && (spinningManny != null && !spinningManny.IsEmpty) && (spinningManny.GetContoursOnImagePlane(0).Any() || spinningManny.GetContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1).Any())) checkSupportStruct = true;
             if (checkSupportStruct)
             {
@@ -259,7 +265,7 @@ namespace VMATTBI_optLoop
                 //structure (i.e., the couch) through the end of the couch thus exiting the CT image altogether. Eclipse warns that you are transporting radiation through a structure at the end of the CT image, which
                 //defines the world volume (i.e., outside this volume, the radiation transport is killed)
                 confirmUI CUI = new VMATTBI_optLoop.confirmUI();
-                CUI.message.Text = String.Format("I found couch contours on the first or last slices of the CT image!") + Environment.NewLine + Environment.NewLine + 
+                CUI.message.Text = String.Format("I found support structure contours on the first or last slices of the CT image!") + Environment.NewLine + Environment.NewLine + 
                                                  "Do you want to remove them?!" + Environment.NewLine + "(The script will be less likely to throw warnings)";
                 CUI.ShowDialog();
                 //remove all applicable contours on the first and last CT slices
@@ -306,17 +312,9 @@ namespace VMATTBI_optLoop
                             }
                         }
                     }
-                    foreach (Structure s in couch)
+                    foreach (Structure s in supports)
                     {
                         //check to ensure the structure is actually contoured (otherwise you will likely get an error if the structure is null)
-                        if (!s.IsEmpty)
-                        {
-                            s.ClearAllContoursOnImagePlane(0);
-                            s.ClearAllContoursOnImagePlane(plan.StructureSet.Image.ZSize - 1);
-                        }
-                    }
-                    foreach (Structure s in rails)
-                    {
                         if (!s.IsEmpty)
                         {
                             s.ClearAllContoursOnImagePlane(0);
