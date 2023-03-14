@@ -966,7 +966,7 @@ namespace VMATTBIautoPlan
             else if (!int.TryParse(numVMATisosTB.Text, out tmp)) MessageBox.Show("Error! Requested number of VMAT isocenters is NaN! Please try again!");
             else if (tmp == numVMATIsos) MessageBox.Show("Warning! Requested number of VMAT isocenters = current number of VMAT isocenters!");
             else if (!allVMAT && (tmp < 2 || tmp > 4)) MessageBox.Show("Error! Requested number of VMAT isocenters is less than 2 or greater than 4! Please try again!");
-            else if (allVMAT && (tmp < 2 || tmp > 6)) MessageBox.Show("Error! Requested number of VMAT isocenters is less than 2 or greater than 69! Please try again!");
+            else if (allVMAT && (tmp < 2 || tmp > 6)) MessageBox.Show("Error! Requested number of VMAT isocenters is less than 2 or greater than 6! Please try again!");
             else
             {
                 if (!optParameters.Where(x => x.Item1.ToLower().Contains("brain")).Any()) beamsPerIso[0]++;
