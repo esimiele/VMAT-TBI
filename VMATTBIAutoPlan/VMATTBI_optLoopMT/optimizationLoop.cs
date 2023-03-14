@@ -237,7 +237,7 @@ namespace VMATTBI_optLoop
             if (!supports.Any() && supportStructureIds.Any())
             {
                 confirmUI CUI = new VMATTBI_optLoop.confirmUI();
-                CUI.message.Text = String.Format("I didn't found any support structures in the structure set!") + Environment.NewLine + Environment.NewLine + "Continue?!";
+                CUI.message.Text = String.Format("No support structures detected in the structure set!") + Environment.NewLine + Environment.NewLine + "Continue?!";
                 CUI.ShowDialog();
                 if (!CUI.confirm) return true;
             }
