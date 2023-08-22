@@ -300,7 +300,7 @@ namespace VMATTBI_optLoop
                         //optimize with intermediate dose (AAA algorithm).
                         try
                         {
-                            OptimizerResult optRes = d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.NoIntermediateDose, ""));
+                            OptimizerResult optRes = d.plan.OptimizeVMAT(new OptimizationOptionsVMAT(OptimizationIntermediateDoseOption.UseIntermediateDose, ""));
                             if (!optRes.Success) { Dispatcher.BeginInvoke((Action)(() => { provideUpdate(String.Format(" Error! Optimization failed!" + System.Environment.NewLine + " Try running the optimization manually Eclipse for more information!" + System.Environment.NewLine + System.Environment.NewLine + " Exiting!")); })); abortOpt = true; }
                             d.app.SaveModifications();
                         }
