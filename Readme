@@ -1,3 +1,15 @@
+
+# *Attention!!*
+
+1/20/2024
+*THIS REPOSITORY IS NO LONGER BEING ACTIVELY DEVELOPED! ONLY CRITICAL BUGS FIXES WILL BE ADDRESSED!*
+The actively maintained version of the VMAT TBI autoplanning code can be found here:
+https://github.com/esimiele/VMAT-TBI-CSI
+
+See the readme in that repo for details (includes automated planning for VMAT CSI as well). 
+*All users of this repository should begin migrating to the new version of the code as this repository will NOT be supported indefinitely!*
+
+---
 Updated 1/13/2023
 
 Changes from 1/9/2023
